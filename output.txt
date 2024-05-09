@@ -1,0 +1,6 @@
+B-E|
+B-E|J=T
+P(B=T|J=T,M=T) A-E,0,0
+P(B=T|J=T,M=T) E-A,0,0
+P(J=T|B=T) A-E-M,0,0
+P(J=T|B=T) M-E-A,0,0

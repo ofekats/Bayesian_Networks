@@ -11,19 +11,22 @@ public class Variable_Elimination_Algo {
 
     }
 
-    public void join_factor(){ //what to get and return?
+    private void join_factor(){ //what to get and return?
         System.out.println("join");
     }
 
-    public void eliminate(){ //what to get and return?
+    private void eliminate(){ //what to get and return?
         System.out.println("eliminate");
     }
 
-    public void normalization(){ //what to get and return?
+    private void normalization(){ //what to get and return?
         System.out.println("normalization");
     }
 
     public String run_algo(){
+        this.join_factor();
+        this.eliminate();
+        this.normalization();
         String result = this.problem + "," + count_add + "," + count_mul;
         return result;
     }

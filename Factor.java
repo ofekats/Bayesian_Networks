@@ -3,13 +3,13 @@ import java.util.List;
 
 public class Factor {
     private List<String> variables_list = new LinkedList<>();
-    private List<Integer> values_list = new LinkedList<>();
+    private List<Double> values_list = new LinkedList<>();
 
     public Factor()
     {
     }
 
-    public Factor(List<String> variables_list, List<Integer> values_list)
+    public Factor(List<String> variables_list, List<Double> values_list)
     {
         this.variables_list = variables_list;
         this.values_list = values_list;
@@ -20,7 +20,7 @@ public class Factor {
         this.variables_list.add(var);
     }
 
-    public void add_to_values_list(int val)
+    public void add_to_values_list(double val)
     {
         this.values_list.add(val);
     }
@@ -40,7 +40,7 @@ public class Factor {
                 st += var + " ";
             }
         st += "\nvalues_list: ";
-        for (int val : this.values_list)
+        for (double val : this.values_list)
             {
                 st += val + " ";
             }

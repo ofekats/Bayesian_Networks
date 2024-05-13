@@ -54,7 +54,7 @@ public class Variable_Elimination_Algo {
             Node node = net_file_nodeList.item(temp);
             if (node.getNodeType() == Node.ELEMENT_NODE) {
                 Element definitionElement = (Element) node;
-                if (definitionElement.getTagName() == "DEFINITION"){
+                if (definitionElement.getTagName() == "DEFINITION") {
                     Factor new_factor = new Factor();
                     // Get child elements within "DEFINITION"
                     NodeList childNodes = definitionElement.getChildNodes();
@@ -64,23 +64,24 @@ public class Variable_Elimination_Algo {
                         if (childNode.getNodeType() == Node.ELEMENT_NODE) {
                             Element childElement = (Element) childNode;
                             // Check for "for", "table", and "given" elements
-                            if (childElement.getTagName().equals("for") ||
-                                childElement.getTagName().equals("given")) {
+                            if (childElement.getTagName().equals("FOR") ||
+                                childElement.getTagName().equals("GIVEN")) {
                                 new_factor.add_to_variables_list(childElement.getTextContent());
                             }
-                            if (childElement.getTagName().equals("table")) {
+                            if (childElement.getTagName().equals("TABLE")) {
                                 String values = childElement.getTextContent();
                                 String[] values_parts = values.split(" ");
-                                for(String val : values_parts){
+                                for (String val : values_parts) {
                                     try {
-                                        int intValue = Integer.parseInt(val);
-                                        // Add the integer value to your list
-                                        new_factor.add_to_values_list(intValue);
+                                        double doubleValue = Double.parseDouble(val);
+                                        // Add the double value to your list
+                                        new_factor.add_to_values_list(doubleValue);
                                     } catch (NumberFormatException e) {
-                                        // Handle the case where the value cannot be parsed as an integer
-                                        System.err.println("Failed to parse value as integer: " + val);
+                                        // Handle the case where the value cannot be parsed as a double
+                                        System.err.println("Failed to parse value as double: " + val);
                                     }
                                 }
+                                
                             }
                         }
                     }
@@ -121,18 +122,19 @@ public class Variable_Elimination_Algo {
         {
             //print
             System.out.println(fac.toString());
-
-            for (String var : fac.get_variables_list())
-            {
-                if(fac.is_var_in_factor(var) == false){
-                    flag_have_answer = 0;
+            if (fac.is_var_in_factor(query_var)){
+                for (String var : evedence_vars_dict.keySet())
+                {
+                    if(fac.is_var_in_factor(var) == false){
+                        flag_have_answer = 0;
+                    }
                 }
+                if (flag_have_answer == 1){
+                    String result = this.problem + ",0,0"; //how to get the correct answer???
+                    return result;
+                }
+                flag_have_answer = 1;
             }
-            if (flag_have_answer == 1){
-                String result = this.problem + ",0,0"; //how to get the correct answer???
-                return result;
-            }
-            flag_have_answer = 1;
         }
 
         
@@ -141,6 +143,7 @@ public class Variable_Elimination_Algo {
             this.eliminate();
         }
         this.normalization();
+        System.out.println("\n");
         String result = this.problem + "," + count_add + "," + count_mul;
         return result;
     }

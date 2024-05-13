@@ -3,7 +3,7 @@ import java.util.List;
 
 public class Factor {
     List<String> variables_list = new LinkedList<>();
-    List<String> values_list = new LinkedList<>();
+    List<Integer> values_list = new LinkedList<>();
 
     public Factor()
     {

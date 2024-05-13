@@ -7,7 +7,7 @@ public class Factor {
 
     public Factor()
     {
-
+        
     }
 
     public boolean is_var_in_factor(String var){

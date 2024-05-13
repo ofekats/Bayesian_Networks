@@ -3,6 +3,13 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.File;
 import java.io.FileOutputStream;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.DocumentBuilder;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+import org.w3c.dom.Node;
 
 public class Ex1 {
 
@@ -34,7 +41,22 @@ public class Ex1 {
             String base_net_file = line;
 
             //open bayesian network file
-            
+            File base_netFile = new File(base_net_file);
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(base_netFile);
+            doc.getDocumentElement().normalize();
+            NodeList nodeList = doc.getElementsByTagName("*"); // Get all elements
+
+            // Loop through each element
+            for (int temp = 0; temp < nodeList.getLength(); temp++) {
+                // Process your XML nodes here
+                Node node = nodeList.item(temp);
+                if (node.getNodeType() == Node.ELEMENT_NODE) {
+                    System.out.println("Element: " + node.getNodeName());
+                    System.out.println("Input: " + node.getTextContent());
+                }
+            }
 
             //for each line in input file call the correct algo and write the output to the output file
             line = inputReader.readLine();
@@ -54,7 +76,7 @@ public class Ex1 {
             // Close the input and output files
             inputReader.close();
             output_fos.close();
-        } catch (IOException e) {
+        } catch (ParserConfigurationException | SAXException | IOException e) {
             // Handle any errors that occur
             e.printStackTrace();
         }

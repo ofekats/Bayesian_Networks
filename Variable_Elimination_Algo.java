@@ -91,11 +91,11 @@ public class Variable_Elimination_Algo {
         }
     }
 
-    private void join_factor(){ //what to get and return?
+    private void join_factor(String hidden){ //what to get and return?
         System.out.println("join");
     }
 
-    private void eliminate(){ //what to get and return?
+    private void eliminate(String hidden){ //what to get and return?
         System.out.println("eliminate");
     }
 
@@ -122,6 +122,8 @@ public class Variable_Elimination_Algo {
         {
             //print
             System.out.println(fac.toString());
+
+
             if (fac.is_var_in_factor(query_var)){
                 for (String var : evedence_vars_dict.keySet())
                 {
@@ -137,10 +139,9 @@ public class Variable_Elimination_Algo {
             }
         }
 
-        
-        while (hidden_vars_arr.length == 0){ //!= 0
-            this.join_factor();
-            this.eliminate();
+        for (String hidden : hidden_vars_arr){
+            this.join_factor(hidden);
+            this.eliminate(hidden);
         }
         this.normalization();
         System.out.println("\n");

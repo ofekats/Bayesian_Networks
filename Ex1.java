@@ -33,7 +33,10 @@ public class Ex1 {
             //first line is the name of the basesian network file
             String base_net_file = line;
 
-            //for each line call the correct algo and write the output to the output file
+            //open bayesian network file
+            
+
+            //for each line in input file call the correct algo and write the output to the output file
             line = inputReader.readLine();
             while (line != null) {
                 // Check if the line starts with "P" then call the variable_elimination_algo

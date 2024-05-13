@@ -1,5 +1,5 @@
 public class Bayes_Ball_Algo {
-    String problem;
+    private String problem;
 
     public Bayes_Ball_Algo(String problem){
         this.problem = problem;

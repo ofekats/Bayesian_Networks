@@ -19,8 +19,8 @@ public class Ex1 {
         return bb.run_algo();
     }
 
-    public static String variable_elimination_algo(String line){
-        Variable_Elimination_Algo ve = new Variable_Elimination_Algo(line);
+    public static String variable_elimination_algo(String line, NodeList net_file_nodeList){
+        Variable_Elimination_Algo ve = new Variable_Elimination_Algo(line, net_file_nodeList);
         return ve.run_algo();
     }
 
@@ -46,24 +46,14 @@ public class Ex1 {
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(base_netFile);
             doc.getDocumentElement().normalize();
-            NodeList nodeList = doc.getElementsByTagName("*"); // Get all elements
-
-            // Loop through each element
-            for (int temp = 0; temp < nodeList.getLength(); temp++) {
-                // Process your XML nodes here
-                Node node = nodeList.item(temp);
-                if (node.getNodeType() == Node.ELEMENT_NODE) {
-                    System.out.println("Element: " + node.getNodeName());
-                    System.out.println("Input: " + node.getTextContent());
-                }
-            }
+            NodeList net_file_nodeList = doc.getElementsByTagName("*"); // Get all elements
 
             //for each line in input file call the correct algo and write the output to the output file
             line = inputReader.readLine();
             while (line != null) {
                 // Check if the line starts with "P" then call the variable_elimination_algo
                 if (line.startsWith("P")) {
-                    output_fos.write(variable_elimination_algo(line).getBytes());
+                    output_fos.write(variable_elimination_algo(line, net_file_nodeList).getBytes());
                 }else { //otherwise call the bayes_ball_algo
                     output_fos.write(bayes_ball_algo(line).getBytes());
                 }

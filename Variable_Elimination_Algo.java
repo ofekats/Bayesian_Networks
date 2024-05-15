@@ -12,6 +12,7 @@ public class Variable_Elimination_Algo {
     private int count_add;
     private int count_mul;
     private String problem;
+    String problem_vars;
     private String query_var;
     private Map<String, String> evedence_vars_dict = new HashMap<>(); // for example B=T
     private String[] hidden_vars_arr;
@@ -32,16 +33,26 @@ public class Variable_Elimination_Algo {
         this.query_var = problem.substring(2, 3);
         //evidence
         int index_end_evedence = problem.indexOf(")");
-        String evedence_str = problem.substring(6, index_end_evedence);
-        String[] evedence_str_parts = evedence_str.split(",");
-        for(String evedevce : evedence_str_parts){
-            String[] var_bool = evedevce.split("=");
-            this.evedence_vars_dict.put(var_bool[0], var_bool[1]);
+        if(problem.length() > 6 && index_end_evedence > 6 ){
+            String evedence_str = problem.substring(6, index_end_evedence);
+            String[] evedence_str_parts = evedence_str.split(",");
+            for(String evedevce : evedence_str_parts){
+                String[] var_bool = evedevce.split("=");
+                this.evedence_vars_dict.put(var_bool[0], var_bool[1]);
+            }
         }
+        
         //hidden
         if(problem.length() > index_end_evedence+1){
             String hidden_str = problem.substring(index_end_evedence+1);
             this.hidden_vars_arr = hidden_str.split("-");
+        }
+
+        //for get_probability
+        if(evedence_vars_dict.size() != 1){
+            problem_vars = problem.substring(2,index_end_evedence);
+        }else{
+            problem_vars = problem.substring(2);
         }
     }
 
@@ -91,11 +102,9 @@ public class Variable_Elimination_Algo {
                     }
                 }
                 if (flag_have_answer == 1){
-
-
-
-
-                    String result = this.problem + ",0,0"; //how to get the correct answer???
+                    System.out.println("have the answer!");
+                    System.out.println("problem_vars: " + problem_vars);
+                    String result = fac.get_propability(problem_vars) + ",0,0";
                     return result;
                 }
                 flag_have_answer = 1;

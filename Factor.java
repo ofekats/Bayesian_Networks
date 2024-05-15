@@ -28,6 +28,17 @@ public class Factor {
         return this.variables_list;
     }
 
+    public Double get_propability(String vars){
+        for(String vals_and_option : this.probabilities.keySet())
+        {
+            if(vals_and_option.equals(vars))
+            {
+                return this.probabilities.get(vars);
+            }
+        }
+        return 0.0;
+    }
+
     public String toString(){
         String st = "variables_list: ";
         for (String var : this.variables_list)

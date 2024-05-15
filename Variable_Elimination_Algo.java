@@ -22,7 +22,7 @@ public class Variable_Elimination_Algo {
         count_add = 0;
         count_mul = 0;
         this.problem = problem;
-        this.analyse_problem();
+        this.analyse_problem(); //get query, eveidence and hidden
         this.net_file_nodeList = net_file_nodeList;
     }
 
@@ -45,50 +45,9 @@ public class Variable_Elimination_Algo {
         }
     }
 
-    private void create_factors(){ //what to get and return?
+    private void create_factors(){ 
         System.out.println("create factors");
-
-        // Loop through each element
-        for (int temp = 0; temp < net_file_nodeList.getLength(); temp++) {
-            // Process your XML nodes here
-            Node node = net_file_nodeList.item(temp);
-            if (node.getNodeType() == Node.ELEMENT_NODE) {
-                Element definitionElement = (Element) node;
-                if (definitionElement.getTagName() == "DEFINITION") {
-                    Factor new_factor = new Factor();
-                    // Get child elements within "DEFINITION"
-                    NodeList childNodes = definitionElement.getChildNodes();
-                    // Loop over child elements
-                    for (int j = 0; j < childNodes.getLength(); j++) {
-                        Node childNode = childNodes.item(j);
-                        if (childNode.getNodeType() == Node.ELEMENT_NODE) {
-                            Element childElement = (Element) childNode;
-                            // Check for "for", "table", and "given" elements
-                            if (childElement.getTagName().equals("FOR") ||
-                                childElement.getTagName().equals("GIVEN")) {
-                                new_factor.add_to_variables_list(childElement.getTextContent());
-                            }
-                            if (childElement.getTagName().equals("TABLE")) {
-                                String values = childElement.getTextContent();
-                                String[] values_parts = values.split(" ");
-                                for (String val : values_parts) {
-                                    try {
-                                        double doubleValue = Double.parseDouble(val);
-                                        // Add the double value to your list
-                                        new_factor.add_to_values_list(doubleValue);
-                                    } catch (NumberFormatException e) {
-                                        // Handle the case where the value cannot be parsed as a double
-                                        System.err.println("Failed to parse value as double: " + val);
-                                    }
-                                }
-                                
-                            }
-                        }
-                    }
-                    factors_list.add(new_factor);
-                }
-            }
-        }
+        factors_list = Base_net_handler.create_factors(net_file_nodeList);
     }
 
     private void join_factor(String hidden){ //what to get and return?
@@ -132,6 +91,10 @@ public class Variable_Elimination_Algo {
                     }
                 }
                 if (flag_have_answer == 1){
+
+
+
+
                     String result = this.problem + ",0,0"; //how to get the correct answer???
                     return result;
                 }

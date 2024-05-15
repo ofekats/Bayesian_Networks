@@ -5,27 +5,18 @@ import java.util.Map;
 
 public class Factor {
     private List<String> variables_list = new ArrayList<>();
-    // private List<Double> values_list = new ArrayList<>();
     private Map<String, Double> probabilities = new HashMap<>();
 
     public Factor()
-    {
-    }
-
-    // public Factor(List<String> variables_list, List<Double> values_list)
-    // {
-    //     this.variables_list = variables_list;
-    //     this.values_list = values_list;
-    // }
+    {}
 
     public void add_to_variables_list(String var)
     {
         this.variables_list.add(var);
     }
 
-    public void add_to_values_list(String var, double val) // "A=T|E=T,B=T":NUMBER
+    public void add_to_values_to_map(String var, double val) // "A=T|E=T,B=T":NUMBER
     {
-        // this.values_list.add(val);
         this.probabilities.put(var, val);
     }
 
@@ -44,10 +35,6 @@ public class Factor {
                 st += var + " ";
             }
         st += "\nvalues_list: ";
-        // for (double val : this.values_list)
-        //     {
-        //         st += val + " ";
-        //     }
         if(this.probabilities != null)
         {
             for (String var : this.probabilities.keySet()){

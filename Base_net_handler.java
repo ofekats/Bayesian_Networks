@@ -10,22 +10,20 @@ import org.w3c.dom.NodeList;
 
 public class Base_net_handler {
 
+    //help function to get the permutation as needed
+    //move the first element of list to be the last
     public static List<String> moveFirstToLast(List<String> variables_list) {
-        if (!variables_list.isEmpty()) { // Check if the list is not empty
-            String firstVar = variables_list.remove(0); // Remove the first variable
-            variables_list.add(firstVar); // Add the first variable to the end
+        if (!variables_list.isEmpty()) { // check if the list is not empty
+            String firstVar = variables_list.remove(0); // remove the first variable
+            variables_list.add(firstVar); // add the first variable to the end
         }
         return variables_list;
     }
 
+    //permutation of all the varieables options
     private static List<List<String>> generatePermutations(List<String> vars, Map<String, List<String>> map) {
         List<List<String>> permutations = new ArrayList<>();
-        generatePermutationsHelper(vars, map, 0, new ArrayList<>(), permutations);
-        //print
-        System.out.println("per");
-        for (List<String> per : permutations){
-            System.out.println(per + "\n");
-        }
+        generatePermutationsHelper(vars, map, 0, new ArrayList<>(), permutations); //help function
         return permutations;
     }
 
@@ -38,16 +36,17 @@ public class Base_net_handler {
         String currentVar = vars.get(index);
         List<String> options = map.get(currentVar);
 
+        //loop through each option for the current variable
         for (String option : options) {
             current.add(option);
-            generatePermutationsHelper(vars, map, index + 1, current, permutations);
+            generatePermutationsHelper(vars, map, index + 1, current, permutations); // recurse to the next variable
             current.remove(current.size() - 1);
         }
     }
     
     
     public static List<Factor> create_factors(NodeList net_file_nodeList){
-        //for each var what are his options (T/F)
+        //for each var what are his options (for example - T/F or 0/1/2)
         Map<String, List<String>> map_var_to_all_the_options = new HashMap<>();
         String name = "";
         List<String> options = new ArrayList<>();
@@ -74,13 +73,14 @@ public class Base_net_handler {
                             }
                         }
                     }
-                    map_var_to_all_the_options.put(name, new ArrayList<>(options)); // Create a new list for each variable
-                    options.clear(); // Clear the list for the next variable
+                    map_var_to_all_the_options.put(name, new ArrayList<>(options)); // create a new list for each variable
+                    options.clear(); // clear the list for the next variable
                 }
             }
         }
 
 
+        //create factors
         List<Factor> factors_list = new LinkedList<>();
         // Loop through each element
         for (int temp = 0; temp < net_file_nodeList.getLength(); temp++) {
@@ -108,18 +108,6 @@ public class Base_net_handler {
                                 List<String> vars = moveFirstToLast(new_factor.get_variables_list());
                                 List<List<String>> perList = generatePermutations(vars, map_var_to_all_the_options);
 
-                                //print 
-                                System.out.println("variables_list: ");
-                                for (String var : vars)
-                                    {
-                                        System.out.println(var + " ");
-                                    }
-                                System.out.println("\nvalues_list: ");
-                                for (List<String> per : perList){
-                                    System.out.println(per + "\n");
-                                }
-
-
                                 for (int i = 0; i < perList.size(); i++) {
                                     try {
                                         double doubleValue = Double.parseDouble(values_parts[i]);
@@ -136,7 +124,7 @@ public class Base_net_handler {
                                             res = vars.get(k) + "=" + perList.get(i).get(k);
                                         }
                                         // Add the double value to your list
-                                        new_factor.add_to_values_list(res,doubleValue);
+                                        new_factor.add_to_values_to_map(res,doubleValue);
 
                                     } catch (NumberFormatException e) {
                                         // Handle the case where the value cannot be parsed as a double

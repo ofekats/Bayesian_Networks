@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -59,10 +60,60 @@ public class Variable_Elimination_Algo {
     private void create_factors(){ 
         System.out.println("create factors");
         factors_list = Base_net_handler.create_factors(net_file_nodeList);
+
+        //only the needed values given with the evedence vars
+        List<String> to_remove = new ArrayList<>();
+        for (String evedence : evedence_vars_dict.keySet()){
+            for(Factor fac : factors_list){
+                if(fac.is_var_in_factor(evedence)){}
+                    for(String prob_vars : fac.get_propability_map().keySet()){
+                        String evedence_option = evedence + "=" + evedence_vars_dict.get(evedence);
+                        System.out.println("evedence:" + evedence + "evedence_option: " + evedence_option);
+                        if(!prob_vars.contains(evedence_option)){
+                            to_remove.add(prob_vars);
+                            
+                    }
+                }
+                for(String remove : to_remove)
+                {
+                    fac.remove_from_propability_map(remove);
+                }
+            }
+            
+        }
+    }
+        
+
+    private void remove_factors_with_one_val(){ 
+        System.out.println("remove factors with one val");
+        List<Factor> factors_to_remove = new LinkedList<>();
+        for(Factor fac : factors_list){
+            if(fac.get_propability_map().size() <= 1){
+                factors_to_remove.add(fac);
+            }
+        }
+        for(Factor fac_to_remove : factors_to_remove){
+            this.factors_list.remove(fac_to_remove);
+        }
     }
 
-    private void join_factor(String hidden){ //what to get and return?
+    private void join_factor(String hidden){ 
         System.out.println("join");
+        List<Factor> factors_to_join = new LinkedList<>();
+        List<Factor> factors_to_remove = new LinkedList<>();
+        //only the factor the hidden is in
+        for(Factor fac : factors_list){
+            if(fac.is_var_in_factor(hidden)){
+                factors_to_join.add(fac);
+            }else{
+                factors_to_remove.add(fac);
+            }
+        }
+        for(Factor fac_to_remove : factors_to_remove){
+            this.factors_list.remove(fac_to_remove);
+        }
+
+
     }
 
     private void eliminate(String hidden){ //what to get and return?

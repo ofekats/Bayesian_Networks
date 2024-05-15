@@ -39,6 +39,14 @@ public class Factor {
         return 0.0;
     }
 
+    public Map<String, Double> get_propability_map(){
+        return this.probabilities;
+    }
+
+    public void remove_from_propability_map(String vars){
+        this.probabilities.remove(vars);
+    }
+
     public String toString(){
         String st = "variables_list: ";
         for (String var : this.variables_list)

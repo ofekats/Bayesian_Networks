@@ -4,9 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.w3c.dom.Element;
 
 public class Variable_Elimination_Algo {
     //to count how many times performed addition or multiplication
@@ -68,7 +66,7 @@ public class Variable_Elimination_Algo {
                 if(fac.is_var_in_factor(evedence)){}
                     for(String prob_vars : fac.get_propability_map().keySet()){
                         String evedence_option = evedence + "=" + evedence_vars_dict.get(evedence);
-                        System.out.println("evedence:" + evedence + "evedence_option: " + evedence_option);
+                        System.out.println("evedence:" + evedence + " evedence_option: " + evedence_option);
                         if(!prob_vars.contains(evedence_option)){
                             to_remove.add(prob_vars);
                             
@@ -81,6 +79,7 @@ public class Variable_Elimination_Algo {
             }
             
         }
+        remove_factors_with_one_val();
     }
         
 
@@ -112,6 +111,27 @@ public class Variable_Elimination_Algo {
         for(Factor fac_to_remove : factors_to_remove){
             this.factors_list.remove(fac_to_remove);
         }
+        //creat new factor - join of tow
+        Factor new_factor = new Factor();
+        for(int i = 0; i < factors_to_join.size() - 1; ++i){
+            //add the vars into the new factor
+            for(String var : factors_to_join.get(i).get_variables_list()){
+                new_factor.add_to_variables_list(var);
+            }
+            for(String var : factors_to_join.get(i+1).get_variables_list()){
+                new_factor.add_to_variables_list(var);
+            }
+            //add the new values
+            int size = Math.max(factors_to_join.get(i).get_propability_map().size(), factors_to_join.get(i+1).get_propability_map().size());
+            for(int j = 0; j < size;  ++j)
+            {
+                List<String> var_the_same = new ArrayList<>(factors_to_join.get(i).get_variables_list());
+                var_the_same.retainAll(factors_to_join.get(i+1).get_variables_list());
+                //!!!!!!!!!!!!!!!!!!!!!!!!
+            }
+        }
+
+
 
 
     }

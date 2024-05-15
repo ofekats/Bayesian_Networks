@@ -12,7 +12,9 @@ public class Factor {
 
     public void add_to_variables_list(String var)
     {
-        this.variables_list.add(var);
+        if(!this.variables_list.contains(var)){
+            this.variables_list.add(var);
+        }
     }
 
     public void add_to_values_to_map(String var, double val) // "A=T|E=T,B=T":NUMBER

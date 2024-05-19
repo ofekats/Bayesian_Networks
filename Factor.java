@@ -41,11 +41,11 @@ public class Factor {
         return 0.0;
     }
 
-    public Map<String, Double> get_propability_map(){
+    public Map<String, Double> get_probability_map(){
         return this.probabilities;
     }
 
-    public void remove_from_propability_map(String vars){
+    public void remove_from_probability_map(String vars){
         this.probabilities.remove(vars);
     }
 

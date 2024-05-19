@@ -13,7 +13,7 @@ public class Variable_Elimination_Algo {
     private String problem;
     String problem_vars;
     private String query_var;
-    private Map<String, String> evedence_vars_dict = new HashMap<>(); // for example B=T
+    private Map<String, String> evidence_vars_dict = new HashMap<>(); // for example B=T
     private String[] hidden_vars_arr;
     private List<Factor> factors_list = new LinkedList<>();
     private NodeList net_file_nodeList;
@@ -22,34 +22,34 @@ public class Variable_Elimination_Algo {
         count_add = 0;
         count_mul = 0;
         this.problem = problem;
-        this.analyse_problem(); //get query, eveidence and hidden
+        this.analyse_problem(); //get query, evidence and hidden
         this.net_file_nodeList = net_file_nodeList;
     }
 
-    //get the query, evedence and hidden vars from the problem
+    //get the query, evidence and hidden vars from the problem
     private void analyse_problem(){
         //query
         this.query_var = problem.substring(2, 3);
         //evidence
-        int index_end_evedence = problem.indexOf(")");
-        if(problem.length() > 6 && index_end_evedence > 6 ){
-            String evedence_str = problem.substring(6, index_end_evedence);
-            String[] evedence_str_parts = evedence_str.split(",");
-            for(String evedevce : evedence_str_parts){
-                String[] var_bool = evedevce.split("=");
-                this.evedence_vars_dict.put(var_bool[0], var_bool[1]);
+        int index_end_evidence = problem.indexOf(")");
+        if(problem.length() > 6 && index_end_evidence > 6 ){
+            String evidence_str = problem.substring(6, index_end_evidence);
+            String[] evidence_str_parts = evidence_str.split(",");
+            for(String evidence : evidence_str_parts){
+                String[] var_bool = evidence.split("=");
+                this.evidence_vars_dict.put(var_bool[0], var_bool[1]);
             }
         }
         
         //hidden
-        if(problem.length() > index_end_evedence+1){
-            String hidden_str = problem.substring(index_end_evedence+1);
+        if(problem.length() > index_end_evidence+1){
+            String hidden_str = problem.substring(index_end_evidence+1);
             this.hidden_vars_arr = hidden_str.split("-");
         }
 
         //for get_probability
-        if(evedence_vars_dict.size() != 1){
-            problem_vars = problem.substring(2,index_end_evedence);
+        if(evidence_vars_dict.size() != 1){
+            problem_vars = problem.substring(2,index_end_evidence);
         }else{
             problem_vars = problem.substring(2);
         }
@@ -59,22 +59,22 @@ public class Variable_Elimination_Algo {
         System.out.println("create factors");
         factors_list = Base_net_handler.create_factors(net_file_nodeList);
 
-        //only the needed values given with the evedence vars
+        //only the needed values given with the evidence vars
         List<String> to_remove = new ArrayList<>();
-        for (String evedence : evedence_vars_dict.keySet()){
+        for (String evidence : evidence_vars_dict.keySet()){
             for(Factor fac : factors_list){
-                if(fac.is_var_in_factor(evedence)){}
-                    for(String prob_vars : fac.get_propability_map().keySet()){
-                        String evedence_option = evedence + "=" + evedence_vars_dict.get(evedence);
-                        System.out.println("evedence:" + evedence + " evedence_option: " + evedence_option);
-                        if(!prob_vars.contains(evedence_option)){
+                if(fac.is_var_in_factor(evidence)){}
+                    for(String prob_vars : fac.get_probability_map().keySet()){
+                        String evidence_option = evidence + "=" + evidence_vars_dict.get(evidence);
+                        System.out.println("evidence:" + evidence + " evidence_option: " + evidence_option);
+                        if(!prob_vars.contains(evidence_option)){
                             to_remove.add(prob_vars);
                             
                     }
                 }
                 for(String remove : to_remove)
                 {
-                    fac.remove_from_propability_map(remove);
+                    fac.remove_from_probability_map(remove);
                 }
             }
             
@@ -87,7 +87,7 @@ public class Variable_Elimination_Algo {
         System.out.println("remove factors with one val");
         List<Factor> factors_to_remove = new LinkedList<>();
         for(Factor fac : factors_list){
-            if(fac.get_propability_map().size() <= 1){
+            if(fac.get_probability_map().size() <= 1){
                 factors_to_remove.add(fac);
             }
         }
@@ -111,7 +111,7 @@ public class Variable_Elimination_Algo {
         for(Factor fac_to_remove : factors_to_remove){
             this.factors_list.remove(fac_to_remove);
         }
-        //creat new factor - join of tow
+        //creat new factor - join of two
         Factor new_factor = new Factor();
         for(int i = 0; i < factors_to_join.size() - 1; ++i){
             //add the vars into the new factor
@@ -122,7 +122,7 @@ public class Variable_Elimination_Algo {
                 new_factor.add_to_variables_list(var);
             }
             //add the new values
-            int size = Math.max(factors_to_join.get(i).get_propability_map().size(), factors_to_join.get(i+1).get_propability_map().size());
+            int size = Math.max(factors_to_join.get(i).get_probability_map().size(), factors_to_join.get(i+1).get_probability_map().size());
             for(int j = 0; j < size;  ++j)
             {
                 List<String> var_the_same = new ArrayList<>(factors_to_join.get(i).get_variables_list());
@@ -148,7 +148,7 @@ public class Variable_Elimination_Algo {
         //prints
         System.out.println("problem: " + problem);
         System.out.println("query var: " + query_var);
-        System.out.println("evedence_vars_dict: " + evedence_vars_dict);
+        System.out.println("evidence_vars_dict: " + evidence_vars_dict);
         System.out.print("hidden_vars_arr: ");
         for (String val : hidden_vars_arr){
             System.out.print(val + " ");
@@ -166,7 +166,7 @@ public class Variable_Elimination_Algo {
 
 
             if (fac.is_var_in_factor(query_var)){
-                for (String var : evedence_vars_dict.keySet())
+                for (String var : evidence_vars_dict.keySet())
                 {
                     if(fac.is_var_in_factor(var) == false){
                         flag_have_answer = 0;

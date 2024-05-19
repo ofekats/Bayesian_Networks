@@ -1,8 +1,4 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -20,7 +16,7 @@ public class Base_net_handler {
         return variables_list;
     }
 
-    //permutation of all the varieables options
+    //permutation of all the variables options
     private static List<List<String>> generatePermutations(List<String> vars, Map<String, List<String>> map) {
         List<List<String>> permutations = new ArrayList<>();
         generatePermutationsHelper(vars, map, 0, new ArrayList<>(), permutations); //help function
@@ -56,7 +52,7 @@ public class Base_net_handler {
             Node node = net_file_nodeList.item(temp);
             if (node.getNodeType() == Node.ELEMENT_NODE) {
                 Element definitionElement = (Element) node;
-                if (definitionElement.getTagName() == "VARIABLE") {
+                if (definitionElement.getTagName().equals("VARIABLE")) {
                     // Get child elements within "VARIABLE"
                     NodeList childNodes = definitionElement.getChildNodes();
                     // Loop over child elements
@@ -88,7 +84,7 @@ public class Base_net_handler {
             Node node = net_file_nodeList.item(temp);
             if (node.getNodeType() == Node.ELEMENT_NODE) {
                 Element definitionElement = (Element) node;
-                if (definitionElement.getTagName() == "DEFINITION") {
+                if (definitionElement.getTagName().equals("DEFINITION")) {
                     Factor new_factor = new Factor();
                     // Get child elements within "DEFINITION"
                     NodeList childNodes = definitionElement.getChildNodes();

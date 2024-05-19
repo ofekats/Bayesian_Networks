@@ -30,7 +30,7 @@ public class Factor {
         return this.variables_list;
     }
 
-    public Double get_propability(String vars){
+    public Double get_probability(String vars){
         for(String vals_and_option : this.probabilities.keySet())
         {
             if(vals_and_option.equals(vars))
@@ -47,6 +47,26 @@ public class Factor {
 
     public void remove_from_probability_map(String vars){
         this.probabilities.remove(vars);
+    }
+
+    public void remove_var_that_not_show(){
+        int flag =0;
+        List<String> to_remove = new ArrayList<>();
+        for(String var : this.variables_list){
+            for(String key : this.probabilities.keySet()){
+                if(key.contains(var)){
+                    flag++;
+                }
+            }
+            if(flag == 0){
+                to_remove.add(var);
+            }
+            flag = 0;
+        }
+
+        for(String del : to_remove){
+            this.variables_list.remove(del);
+        }
     }
 
     public String toString(){

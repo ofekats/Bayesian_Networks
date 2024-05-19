@@ -190,6 +190,7 @@ public class Variable_Elimination_Algo {
                         String need = "";
                         if(index_same != 0){
                             need = var_from1.substring(index_same, last);
+                            System.out.println("need: " + need);
                         }else{
                             need = var_from1.substring(last);
                         }
@@ -217,6 +218,10 @@ public class Variable_Elimination_Algo {
             }
 
             factors_to_join.add(new_factor);
+
+            System.out.println("new factor");
+            new_factor.toString();
+
             if(factors_to_join.size() == 1){
                 break;
             }

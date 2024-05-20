@@ -126,20 +126,24 @@ public class Variable_Elimination_Algo {
             this.factors_list.remove(fac_to_remove);
         }
 
-        List<Factor> new_factors = the_joining(factors_to_join);
+        if(factors_to_join.size() > 1) {
+            List<Factor> new_factors = the_joining(factors_to_join);
+            System.out.println("before while");
+            while(new_factors.size() > 1)
+            {
+                new_factors = the_joining(new_factors);
+            }
 
-        System.out.println("before while");
-        while(new_factors.size() > 1)
-        {
-            new_factors = the_joining(new_factors);
+            System.out.println("after while");
+
+            for(Factor fac: new_factors){
+                fac.remove_var_that_not_show();
+            }
+            factors_list.addAll(new_factors);
+        }else{
+            System.out.println("only one factor not need to join");
+            factors_list.addAll(factors_to_join);
         }
-
-        System.out.println("after while");
-
-        for(Factor fac: new_factors){
-            fac.remove_var_that_not_show();
-        }
-        factors_list.addAll(new_factors);
 
         for(Factor fac : factors_list) {
             //print
@@ -292,6 +296,10 @@ public class Variable_Elimination_Algo {
         String name_of_probability_in_map = "";
         for(Factor fac : factors_to_eliminate)
         {
+            for(String var : fac.get_variables_list()) {
+                new_factor.add_to_variables_list(var);
+            }
+            new_factor.new_map_var_to_all_the_options(fac.get_option_map());
             System.out.println(fac.get_option_map());
             for(String option : fac.get_option_map().get(hidden))
             {
@@ -304,7 +312,7 @@ public class Variable_Elimination_Algo {
                         this.count_add++;
                     }
                 }
-                System.out.println("name_of_probability_in_map" + name_of_probability_in_map);
+                System.out.println("name_of_probability_in_map " + name_of_probability_in_map);
                 new_factor.add_to_values_to_map(name_of_probability_in_map, add);
                 new_factor.remove_var_from_variables_list(hidden);
                 add = 0;
@@ -314,7 +322,7 @@ public class Variable_Elimination_Algo {
             }
 
         }
-
+        System.out.println("factors:");
         for(Factor fac : factors_list) {
             //print
             System.out.println(fac);

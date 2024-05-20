@@ -121,10 +121,8 @@ public class Variable_Elimination_Algo {
                 factors_to_join.add(fac);
             }
         }
-        //remove the join from the real factor list
-        for(Factor fac_to_remove : factors_to_join){
-            this.factors_list.remove(fac_to_remove);
-        }
+        // remove the factors to join from the real factor list
+        factors_list.removeAll(factors_to_join);
 
         if(factors_to_join.size() > 1) {
             List<Factor> new_factors = the_joining(factors_to_join);
@@ -150,6 +148,7 @@ public class Variable_Elimination_Algo {
             System.out.println(fac);
         }
         System.out.println("end join");
+        remove_factors_with_one_val();
         this.eliminate(hidden);
     }
 
@@ -241,6 +240,7 @@ public class Variable_Elimination_Algo {
                         new_factor.add_to_values_to_map(var_from1 +","+ var_from2, mul);
                         System.out.println("add_to_values_to_map: vars- " + var_from1 +","+ var_from2 + " value- " + mul);
                         this.count_mul++;
+                        System.out.println("count_mul: " + count_mul);
                         System.out.println("break");
                         break;
                     }
@@ -284,16 +284,12 @@ public class Variable_Elimination_Algo {
                 factors_to_eliminate.add(fac);
             }
         }
-        //remove the factors to eliminate from the real factor list
-        for(Factor fac_to_remove : factors_to_eliminate){
-            this.factors_list.remove(fac_to_remove);
-        }
-        //!!!!!!!!!!!!!!!!!!!!!!
+        // remove the factors to eliminate from the real factor list
+        factors_list.removeAll(factors_to_eliminate);
 
         Factor new_factor = new Factor();
-        int add = 0;
         String hidden_options = "";
-        String name_of_probability_in_map = "";
+        // process each factor to eliminate
         for(Factor fac : factors_to_eliminate)
         {
             for(String var : fac.get_variables_list()) {
@@ -301,32 +297,41 @@ public class Variable_Elimination_Algo {
             }
             new_factor.new_map_var_to_all_the_options(fac.get_option_map());
             System.out.println(fac.get_option_map());
-            for(String option : fac.get_option_map().get(hidden))
-            {
+
+            Map<String, Double> to_add = new HashMap<>();
+            for(String option : fac.get_option_map().get(hidden)) {
                 hidden_options = hidden + "=" + option;
-                for(String vars : fac.get_probability_map().keySet())
-                {
-                    if(vars.contains(hidden_options)){
-                        name_of_probability_in_map += vars.replace(hidden_options, "");
-                        add += fac.get_probability_map().get(vars);
-                        this.count_add++;
+                System.out.println("hidden_options: " + hidden_options);
+
+                for (String var : fac.get_probability_map().keySet()) {
+                    if (!var.equals(var.replace(hidden_options, ""))) {
+                        String no_hidden = var.replace(hidden_options, "");
+                        if(to_add.containsKey(no_hidden)) {
+                            to_add.put(no_hidden, fac.get_probability_map().get(var)+to_add.get(no_hidden));
+                            this.count_add++;
+                            System.out.println("count_add: " + count_add);
+                        }else {
+                            to_add.put(no_hidden, fac.get_probability_map().get(var));
+                        }
+                        System.out.println("to_add: " + to_add);
                     }
                 }
-                System.out.println("name_of_probability_in_map " + name_of_probability_in_map);
-                new_factor.add_to_values_to_map(name_of_probability_in_map, add);
-                new_factor.remove_var_from_variables_list(hidden);
-                add = 0;
             }
-            if(new_factor.get_variables_list().size() != 0){
-                this.factors_list.add(new_factor);
+            for(String var : to_add.keySet()){
+                new_factor.add_to_values_to_map(var, to_add.get(var));
             }
-
+            this.factors_list.remove(fac);
         }
+
+        this.factors_list.add(new_factor);
+
+
         System.out.println("factors:");
         for(Factor fac : factors_list) {
             //print
             System.out.println(fac);
         }
+        remove_factors_with_one_val();
         System.out.println("end eliminate");
 
     }

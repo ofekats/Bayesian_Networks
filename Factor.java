@@ -2,14 +2,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.*;
 
-public class Factor {
+public class Factor implements Comparable<Factor> {
     private Map<String, List<String>> map_var_to_all_the_options = new HashMap<>();
     private List<String> variables_list = new ArrayList<>();
     private Map<String, Double> probabilities = new HashMap<>();
+    int size;
 
     public Factor()
-    {}
+    {this.size = 0;}
+
+    public int compareTo(Factor other) {
+        return Integer.compare(this.size, other.size);
+    }
 
     public void new_map_var_to_all_the_options(Map<String, List<String>> new_map)
     {
@@ -26,6 +32,7 @@ public class Factor {
     public void add_to_values_to_map(String var, double val) // "A=T|E=T,B=T":NUMBER
     {
         this.probabilities.put(var, val);
+        this.size = probabilities.size();
     }
 
     public boolean is_var_in_factor(String var){
@@ -83,6 +90,11 @@ public class Factor {
         }
     }
 
+    public void update_size()
+    {
+        this.size = probabilities.size();
+    }
+
     public String toString(){
         String st = "variables_list: ";
         for (String var : this.variables_list)
@@ -98,6 +110,7 @@ public class Factor {
             }
             st+= "\n";
         }
+        st+= "\nsize " + this.size;
         st += "\nvalues_list: ";
         if(this.probabilities != null)
         {

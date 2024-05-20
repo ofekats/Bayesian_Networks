@@ -1,8 +1,4 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.w3c.dom.NodeList;
 
@@ -62,7 +58,7 @@ public class Variable_Elimination_Algo {
         System.out.println("factors before removing oneline:");
         for(Factor fac : factors_list) {
             //print
-            System.out.println(fac.toString());
+            System.out.println(fac);
         }
 
         //only the needed values given with the evidence vars
@@ -80,6 +76,7 @@ public class Variable_Elimination_Algo {
                     for (String remove : to_remove) {
                         fac.remove_from_probability_map(remove);
                     }
+                    fac.update_size();
                 }
             }
         }
@@ -88,7 +85,7 @@ public class Variable_Elimination_Algo {
         System.out.println("factors from create factors:");
         for(Factor fac : factors_list) {
             //print
-            System.out.println(fac.toString());
+            System.out.println(fac);
         }
     }
         
@@ -112,7 +109,7 @@ public class Variable_Elimination_Algo {
         System.out.println("factors:");
         for(Factor fac : factors_list) {
             //print
-            System.out.println(fac.toString());
+            System.out.println(fac);
         }
         List<Factor> factors_to_join = new ArrayList<>();
         //only the factor the hidden is in
@@ -123,6 +120,9 @@ public class Variable_Elimination_Algo {
         }
         // remove the factors to join from the real factor list
         factors_list.removeAll(factors_to_join);
+
+        //sort the factors by size
+        Collections.sort(factors_to_join);
 
         if(factors_to_join.size() > 1) {
             List<Factor> new_factors = the_joining(factors_to_join);
@@ -275,7 +275,7 @@ public class Variable_Elimination_Algo {
         System.out.println("factors:");
         for(Factor fac : factors_list) {
             //print
-            System.out.println(fac.toString());
+            System.out.println(fac);
         }
         List<Factor> factors_to_eliminate = new ArrayList<>();
         //only the factor the hidden is in
@@ -306,6 +306,9 @@ public class Variable_Elimination_Algo {
                 for (String var : fac.get_probability_map().keySet()) {
                     if (!var.equals(var.replace(hidden_options, ""))) {
                         String no_hidden = var.replace(hidden_options, "");
+//                        if(no_hidden.contains(hidden)){
+//                            continue;
+//                        }
                         if(to_add.containsKey(no_hidden)) {
                             to_add.put(no_hidden, fac.get_probability_map().get(var)+to_add.get(no_hidden));
                             this.count_add++;

@@ -42,8 +42,8 @@ public class Variable_Elimination_Algo {
         }
         
         //hidden
-        if(problem.length() > index_end_evidence+1){
-            String hidden_str = problem.substring(index_end_evidence+1);
+        if(problem.length() > index_end_evidence+2){
+            String hidden_str = problem.substring(index_end_evidence+2);
             this.hidden_vars_arr = hidden_str.split("-");
         }
 
@@ -125,7 +125,36 @@ public class Variable_Elimination_Algo {
         for(Factor fac_to_remove : factors_to_join){
             this.factors_list.remove(fac_to_remove);
         }
+       //!!!!!!!!!!!!!!!!!!!!!!
+        List<Factor> new_factors = the_joining(factors_to_join);
+
+        System.out.println("before while");
+        while(new_factors.size() > 1)
+        {
+            new_factors = the_joining(new_factors);
+        }
+
+        System.out.println("after while");
+
+        for(Factor fac: new_factors){
+            fac.remove_var_that_not_show();
+        }
+//        int size_join = factors_to_join.size() -1;
+//        if(size_join >= 0){
+//            factors_list.add(factors_to_join.get(size_join));
+//        }
+        factors_list.addAll(new_factors);
+
+        for(Factor fac : factors_list) {
+            //print
+            System.out.println(fac);
+        }
+            System.out.println("end join");
+    }
+
+    private List<Factor> the_joining(List<Factor> factors_to_join){
         //create new factor - join of two
+        List<Factor> new_factors_list = new ArrayList<>();
         Factor new_factor = new Factor();
 
         int factors_to_join_size = factors_to_join.size();
@@ -184,23 +213,21 @@ public class Variable_Elimination_Algo {
                 for(String same_var : var_the_same){
                     if(var_from1.contains(same_var)){
                         int index_same = var_from1.indexOf(same_var);
-                        int last = index_same + 2;
+                        int last = index_same + 3;
                         System.out.println("var: " + same_var+ ", var_from1: " + var_from1);
                         System.out.println("index_same: " + index_same+ ", last: " + last);
                         String need = "";
-                        if(index_same != 0){
+                        if(var_from1.length() > last){
                             need = var_from1.substring(index_same, last);
-                            System.out.println("need: " + need);
-                        }else{
-                            need = var_from1.substring(last);
                         }
-
+                        System.out.println("need: " + need);
                         need_to_have.add(need);
                     }
                 }
                 int flag = 0;
                 double mul = map1.get(var_from1);
                 for(String var_from2 : map2.keySet()){
+                    System.out.println("var_from2: " + var_from2);
                     for(String needed : need_to_have){
                         if(!var_from2.contains(needed)){
                             flag = 1;
@@ -210,42 +237,37 @@ public class Variable_Elimination_Algo {
                     if(flag == 0){
                         mul *= map2.get(var_from2);
                         new_factor.add_to_values_to_map(var_from1 +","+ var_from2, mul);
+                        System.out.println("add_to_values_to_map: vars- " + var_from1 +","+ var_from2 + " value- " + mul);
                         this.count_mul++;
+                        System.out.println("break");
                         break;
                     }
                     flag = 0;
                 }
             }
-
-            factors_to_join.add(new_factor);
+            System.out.println("new_factors_list");
+            new_factors_list.add(new_factor);
 
             System.out.println("new factor");
-            new_factor.toString();
+            System.out.println(new_factor);
+            System.out.println("factors_to_join.size(): " + factors_to_join.size());
 
-            if(factors_to_join.size() == 1){
-                break;
-            }
-            factors_to_join_size++;
         }
-
-        System.out.println("after factors_to_join size: " + factors_to_join.size());
-
-        for(Factor fac: factors_to_join){
-            fac.remove_var_that_not_show();
+        System.out.println("after joining");
+        //if odd size need to add the last one too
+        if(factors_to_join.size() % 2 != 0){
+            new_factors_list.add(factors_to_join.get(factors_to_join.size()-1));
         }
-        int size_join = factors_to_join.size() -1;
-        if(size_join >= 0){
-            factors_list.add(factors_to_join.get(size_join));
-        }
-
-        for(Factor fac : factors_list) {
+        System.out.println("new_factors_list:");
+        for(Factor fac : new_factors_list) {
             //print
-            System.out.println(fac.toString());
+            System.out.println(fac);
         }
-            System.out.println("end join");
+
+        return new_factors_list;
     }
 
-    private void eliminate(String hidden){ //what to get and return?
+        private void eliminate(String hidden){ //what to get and return?
         System.out.println("eliminate");
 
     }

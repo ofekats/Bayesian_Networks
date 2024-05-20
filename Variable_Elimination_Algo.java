@@ -322,7 +322,7 @@ public class Variable_Elimination_Algo {
             }
             this.factors_list.remove(fac);
         }
-
+        new_factor.remove_var_that_not_show();
         this.factors_list.add(new_factor);
 
 
@@ -331,6 +331,7 @@ public class Variable_Elimination_Algo {
             //print
             System.out.println(fac);
         }
+
         remove_factors_with_one_val();
         System.out.println("end eliminate");
 

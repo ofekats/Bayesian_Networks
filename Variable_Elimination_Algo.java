@@ -125,7 +125,7 @@ public class Variable_Elimination_Algo {
         for(Factor fac_to_remove : factors_to_join){
             this.factors_list.remove(fac_to_remove);
         }
-       //!!!!!!!!!!!!!!!!!!!!!!
+
         List<Factor> new_factors = the_joining(factors_to_join);
 
         System.out.println("before while");
@@ -139,17 +139,14 @@ public class Variable_Elimination_Algo {
         for(Factor fac: new_factors){
             fac.remove_var_that_not_show();
         }
-//        int size_join = factors_to_join.size() -1;
-//        if(size_join >= 0){
-//            factors_list.add(factors_to_join.get(size_join));
-//        }
         factors_list.addAll(new_factors);
 
         for(Factor fac : factors_list) {
             //print
             System.out.println(fac);
         }
-            System.out.println("end join");
+        System.out.println("end join");
+        this.eliminate(hidden);
     }
 
     private List<Factor> the_joining(List<Factor> factors_to_join){
@@ -171,7 +168,8 @@ public class Variable_Elimination_Algo {
             for(String var : factors_to_join.get(i+1).get_variables_list()){
                 new_factor.add_to_variables_list(var);
             }
-
+            //option list like in all the factors
+            new_factor.new_map_var_to_all_the_options(factors_to_join.get(i).get_option_map());
             System.out.println("the new var list: " + new_factor.get_variables_list());
 
             //add the new values
@@ -267,8 +265,61 @@ public class Variable_Elimination_Algo {
         return new_factors_list;
     }
 
-        private void eliminate(String hidden){ //what to get and return?
+    private void eliminate(String hidden){ //what to get and return?
         System.out.println("eliminate");
+        System.out.println("hidden:"+ hidden);
+        System.out.println("factors:");
+        for(Factor fac : factors_list) {
+            //print
+            System.out.println(fac.toString());
+        }
+        List<Factor> factors_to_eliminate = new ArrayList<>();
+        //only the factor the hidden is in
+        for(Factor fac : factors_list){
+            if(fac.is_var_in_factor(hidden)){
+                factors_to_eliminate.add(fac);
+            }
+        }
+        //remove the factors to eliminate from the real factor list
+        for(Factor fac_to_remove : factors_to_eliminate){
+            this.factors_list.remove(fac_to_remove);
+        }
+        //!!!!!!!!!!!!!!!!!!!!!!
+
+        Factor new_factor = new Factor();
+        int add = 0;
+        String hidden_options = "";
+        String name_of_probability_in_map = "";
+        for(Factor fac : factors_to_eliminate)
+        {
+            System.out.println(fac.get_option_map());
+            for(String option : fac.get_option_map().get(hidden))
+            {
+                hidden_options = hidden + "=" + option;
+                for(String vars : fac.get_probability_map().keySet())
+                {
+                    if(vars.contains(hidden_options)){
+                        name_of_probability_in_map += vars.replace(hidden_options, "");
+                        add += fac.get_probability_map().get(vars);
+                        this.count_add++;
+                    }
+                }
+                System.out.println("name_of_probability_in_map" + name_of_probability_in_map);
+                new_factor.add_to_values_to_map(name_of_probability_in_map, add);
+                new_factor.remove_var_from_variables_list(hidden);
+                add = 0;
+            }
+            if(new_factor.get_variables_list().size() != 0){
+                this.factors_list.add(new_factor);
+            }
+
+        }
+
+        for(Factor fac : factors_list) {
+            //print
+            System.out.println(fac);
+        }
+        System.out.println("end eliminate");
 
     }
 
@@ -316,8 +367,7 @@ public class Variable_Elimination_Algo {
         }
 
         for (String hidden : hidden_vars_arr){
-            this.join_factor(hidden);
-            this.eliminate(hidden);
+            this.join_factor(hidden); //in join call eliminate with the hidden value
         }
         this.normalization();
         System.out.println("\n");

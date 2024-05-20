@@ -4,11 +4,17 @@ import java.util.List;
 import java.util.Map;
 
 public class Factor {
+    private Map<String, List<String>> map_var_to_all_the_options = new HashMap<>();
     private List<String> variables_list = new ArrayList<>();
     private Map<String, Double> probabilities = new HashMap<>();
 
     public Factor()
     {}
+
+    public void new_map_var_to_all_the_options(Map<String, List<String>> new_map)
+    {
+        this.map_var_to_all_the_options = new_map;
+    }
 
     public void add_to_variables_list(String var)
     {
@@ -41,6 +47,11 @@ public class Factor {
         return 0.0;
     }
 
+    public Map<String, List<String>> get_option_map()
+    {
+        return this.map_var_to_all_the_options;
+    }
+
     public Map<String, Double> get_probability_map(){
         return this.probabilities;
     }
@@ -49,6 +60,9 @@ public class Factor {
         this.probabilities.remove(vars);
     }
 
+    public void remove_var_from_variables_list(String var){
+        this.variables_list.remove(var);
+    }
     public void remove_var_that_not_show(){
         int flag =0;
         List<String> to_remove = new ArrayList<>();
@@ -75,6 +89,15 @@ public class Factor {
             {
                 st += var + " ";
             }
+        st += "\n options list: ";
+        for(String option : this.map_var_to_all_the_options.keySet()){
+            st += "var:"+ option +" options:";
+            for (String options :  this.map_var_to_all_the_options.get(option))
+            {
+                st += options + " ";
+            }
+            st+= "\n";
+        }
         st += "\nvalues_list: ";
         if(this.probabilities != null)
         {

@@ -86,6 +86,7 @@ public class Base_net_handler {
                 Element definitionElement = (Element) node;
                 if (definitionElement.getTagName().equals("DEFINITION")) {
                     Factor new_factor = new Factor();
+                    new_factor.new_map_var_to_all_the_options(map_var_to_all_the_options);
                     // Get child elements within "DEFINITION"
                     NodeList childNodes = definitionElement.getChildNodes();
                     // Loop over child elements

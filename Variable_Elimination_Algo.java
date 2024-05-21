@@ -1,3 +1,4 @@
+import java.text.DecimalFormat;
 import java.util.*;
 
 import org.w3c.dom.NodeList;
@@ -149,7 +150,10 @@ public class Variable_Elimination_Algo {
         }
         System.out.println("end join");
         remove_factors_with_one_val();
-        this.eliminate(hidden);
+        if(hidden != this.query_var)
+        {
+            this.eliminate(hidden);
+        }
     }
 
     private List<Factor> the_joining(List<Factor> factors_to_join){
@@ -218,7 +222,7 @@ public class Variable_Elimination_Algo {
                         System.out.println("var: " + same_var+ ", var_from1: " + var_from1);
                         System.out.println("index_same: " + index_same+ ", last: " + last);
                         String need = "";
-                        if(var_from1.length() > last){
+                        if(var_from1.length() >= last){
                             need = var_from1.substring(index_same, last);
                         }
                         System.out.println("need: " + need);
@@ -305,15 +309,17 @@ public class Variable_Elimination_Algo {
 
                 for (String var : fac.get_probability_map().keySet()) {
                     if (!var.equals(var.replace(hidden_options, ""))) {
+                        System.out.println("original var: " + var);
                         String no_hidden = var.replace(hidden_options, "");
-//                        if(no_hidden.contains(hidden)){
-//                            continue;
-//                        }
+                        System.out.println("no_hidden: " + no_hidden);
                         if(to_add.containsKey(no_hidden)) {
                             to_add.put(no_hidden, fac.get_probability_map().get(var)+to_add.get(no_hidden));
                             this.count_add++;
                             System.out.println("count_add: " + count_add);
                         }else {
+                            if(no_hidden.contains(hidden)){
+                                continue;
+                            }
                             to_add.put(no_hidden, fac.get_probability_map().get(var));
                         }
                         System.out.println("to_add: " + to_add);
@@ -340,8 +346,20 @@ public class Variable_Elimination_Algo {
 
     }
 
-    private void normalization(){ //what to get and return?
+    private void normalization(){
         System.out.println("normalization");
+        double sum_all = 0;
+        for(Factor fac : this.factors_list){
+            if(fac.is_var_in_factor(this.query_var))
+            {
+                for(String var : fac.get_probability_map().keySet()){
+                    sum_all += fac.get_probability_map().get(var);
+                }
+                for(String var : fac.get_probability_map().keySet()){
+                    fac.get_probability_map().put(var,fac.get_probability_map().get(var) / sum_all);
+                }
+            }
+        }
     }
 
     public String run_algo(){
@@ -386,9 +404,28 @@ public class Variable_Elimination_Algo {
         for (String hidden : hidden_vars_arr){
             this.join_factor(hidden); //in join call eliminate with the hidden value
         }
+        this.join_factor(this.query_var);
         this.normalization();
         System.out.println("\n");
-        String result = this.problem + "," + count_add + "," + count_mul;
+        // create a DecimalFormat instance for 5 decimal places
+        DecimalFormat df = new DecimalFormat("#.#####");
+        double res = 0;
+        String needed = this.problem.substring(2,5);
+        System.out.println("needed: " + needed);
+        for(Factor fac : this.factors_list)
+        {
+            if(fac.is_var_in_factor(this.query_var))
+            {
+                for(String var : fac.get_probability_map().keySet())
+                {
+                    if(var.contains(needed))
+                    {
+                        res = fac.get_probability_map().get(var);
+                    }
+                }
+            }
+        }
+        String result = df.format(res) + "," + count_add + "," + count_mul;
         return result;
     }
 }

@@ -40,8 +40,7 @@ public class Base_net_handler {
         }
     }
     
-    
-    public static List<Factor> create_factors(NodeList net_file_nodeList){
+    private static Map<String, List<String>> help_map_option(NodeList net_file_nodeList){
         //for each var what are his options (for example - T/F or 0/1/2)
         Map<String, List<String>> map_var_to_all_the_options = new HashMap<>();
         String name = "";
@@ -65,7 +64,7 @@ public class Base_net_handler {
                                 name = childElement.getTextContent();
                             }
                             if (childElement.getTagName().equals("OUTCOME")) {
-                                options.add(childElement.getTextContent());                                
+                                options.add(childElement.getTextContent());
                             }
                         }
                     }
@@ -74,7 +73,11 @@ public class Base_net_handler {
                 }
             }
         }
-
+        return map_var_to_all_the_options;
+    }
+    public static List<Factor> create_factors(NodeList net_file_nodeList){
+        //for each var what are his options (for example - T/F or 0/1/2)
+        Map<String, List<String>> map_var_to_all_the_options = help_map_option(net_file_nodeList);
 
         //create factors
         List<Factor> factors_list = new LinkedList<>();
@@ -137,5 +140,59 @@ public class Base_net_handler {
             }
         }
         return factors_list;
+    }
+
+
+    public static Map<String, Node_net> create_nodes(NodeList net_file_nodeList){
+        Map<String, Node_net> new_node_map = new HashMap<>();
+        //for each var what are his options (for example - T/F or 0/1/2)
+        Map<String, List<String>> map_var_to_all_the_options = help_map_option(net_file_nodeList);
+        //create new node to each var and add it to the node list
+        for(String var : map_var_to_all_the_options.keySet())
+        {
+            Node_net new_node = new Node_net(var);
+            new_node_map.put(var, new_node);
+        }
+
+        //search for children and parents
+        // Loop through each element
+        for (int temp = 0; temp < net_file_nodeList.getLength(); temp++) {
+            // Process your XML nodes here
+            Node node = net_file_nodeList.item(temp);
+            String name = "";
+            String parent = "";
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                Element definitionElement = (Element) node;
+                if (definitionElement.getTagName().equals("DEFINITION")) {
+                    // Get child elements within "DEFINITION"
+                    NodeList childNodes = definitionElement.getChildNodes();
+                    // Loop over child elements
+                    for (int j = 0; j < childNodes.getLength(); j++) {
+                        Node childNode = childNodes.item(j);
+                        if (childNode.getNodeType() == Node.ELEMENT_NODE) {
+                            Element childElement = (Element) childNode;
+                            // Check for "for" elements
+                            if (childElement.getTagName().equals("FOR")) {
+                                name = childElement.getTextContent();
+                            }
+                            // Check for "given" elements
+                            if (childElement.getTagName().equals("GIVEN")) {
+                                parent = childElement.getTextContent();
+                                for(String var_node : new_node_map.keySet())
+                                {
+                                    if(var_node.equals(parent)){
+                                        //add name to be the child of parent
+                                        new_node_map.get(var_node).add_to_children(new_node_map.get(name));
+                                        //add parent to be the parent of name
+                                        new_node_map.get(name).add_to_parents(new_node_map.get(var_node));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return new_node_map;
     }
 }

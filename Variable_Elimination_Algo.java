@@ -393,6 +393,8 @@ public class Variable_Elimination_Algo {
             {
                 for(String var : fac.get_probability_map().keySet()){
                     sum_all += fac.get_probability_map().get(var);
+                    this.count_add++;
+                    System.out.println("count_add: "+ count_add);
                 }
                 for(String var : fac.get_probability_map().keySet()){
                     fac.get_probability_map().put(var,fac.get_probability_map().get(var) / sum_all);

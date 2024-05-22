@@ -20,6 +20,7 @@ public class Factor implements Comparable<Factor> {
         return Integer.compare(this.ascii_var(), other.ascii_var());
     }
 
+    //return the ascii sum of the variables
     public int ascii_var()
     {
         int sum = 0;

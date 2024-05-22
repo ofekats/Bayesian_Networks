@@ -14,9 +14,24 @@ public class Factor implements Comparable<Factor> {
     {this.size = 0;}
 
     public int compareTo(Factor other) {
-        return Integer.compare(this.size, other.size);
+        if(this.size != other.size){
+            return Integer.compare(this.size, other.size);
+        }
+        return Integer.compare(this.ascii_var(), other.ascii_var());
     }
 
+    public int ascii_var()
+    {
+        int sum = 0;
+        for (String var : this.variables_list) {
+            if (var != null && var.length() == 1) {
+                char ch = var.charAt(0); // get the character
+                int asciiValue = (int) ch; // convert the character to its ASCII value
+                sum += asciiValue;
+            }
+        }
+        return sum;
+    }
     public void new_map_var_to_all_the_options(Map<String, List<String>> new_map)
     {
         this.map_var_to_all_the_options = new_map;

@@ -245,10 +245,9 @@ public class Variable_Elimination_Algo {
                         System.out.println("add_to_values_to_map: vars- " + var_from1 +","+ var_from2 + " value- " + mul);
                         this.count_mul++;
                         System.out.println("count_mul: " + count_mul);
-                        System.out.println("break");
-                        break;
                     }
                     flag = 0;
+                    mul = map1.get(var_from1);
                 }
             }
             System.out.println("new_factors_list");
@@ -257,7 +256,6 @@ public class Variable_Elimination_Algo {
             System.out.println("new factor");
             System.out.println(new_factor);
             System.out.println("factors_to_join.size(): " + factors_to_join.size());
-
         }
         System.out.println("after joining");
         //if odd size need to add the last one too
@@ -414,6 +412,7 @@ public class Variable_Elimination_Algo {
         System.out.println("needed: " + needed);
         for(Factor fac : this.factors_list)
         {
+            System.out.println("factor: " + fac);
             if(fac.is_var_in_factor(this.query_var))
             {
                 for(String var : fac.get_probability_map().keySet())

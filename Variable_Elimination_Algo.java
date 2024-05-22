@@ -88,6 +88,47 @@ public class Variable_Elimination_Algo {
             //print
             System.out.println(fac);
         }
+        //remove all vars that not ancestor to query or evidence - need to find then call eliminate
+        List<String> parents = new ArrayList<>();
+        //add query and evidence to parent
+        parents.add(this.query_var);
+        parents.addAll(this.evidence_vars_dict.keySet());
+
+        for(Factor fac : this.factors_list)
+        {
+            List<String> add_to_parents = new ArrayList<>();
+            for(String par : parents)
+            {
+                if(fac.is_var_in_factor(par)){
+                    add_to_parents.addAll(fac.get_variables_list());
+                    for(Factor fac2 : this.factors_list)
+                    {
+                        for(String var : fac.get_variables_list()){
+                            if(fac2.is_var_in_factor(var)){
+                                add_to_parents.addAll(fac2.get_variables_list());
+                            }
+                        }
+                    }
+                }
+            }
+            parents.addAll(add_to_parents);
+        }
+        List<String> to_eliminate = new ArrayList<>();
+        for(Factor fac : this.factors_list)
+        {
+            for(String var : fac.get_variables_list())
+            {
+                if(!parents.contains(var)){
+                    to_eliminate.add(var);
+                }
+            }
+        }
+        System.out.println("vars to eliminate: " + to_eliminate);
+        for(String var : to_eliminate)
+        {
+            eliminate(var);
+        }
+        //remove all vars that independent of query by knowing evidence - baseball find then call eliminate
     }
         
 

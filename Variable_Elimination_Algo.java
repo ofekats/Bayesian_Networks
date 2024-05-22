@@ -132,6 +132,7 @@ public class Variable_Elimination_Algo {
     }
         
 
+    //check if there are factors with one value and if so remove them
     private void remove_factors_with_one_val(){ 
         System.out.println("remove factors with one val");
         List<Factor> factors_to_remove = new LinkedList<>();
@@ -145,6 +146,7 @@ public class Variable_Elimination_Algo {
         }
     }
 
+    //join all the factors with the hidden value
     private void join_factor(String hidden){ 
         System.out.println("join");
         System.out.println("hidden:" + hidden);
@@ -197,6 +199,7 @@ public class Variable_Elimination_Algo {
         }
     }
 
+    //join a list of factors the sort by size or ascii sum (if size is equal)
     private List<Factor> the_joining(List<Factor> factors_to_join){
         //create new factor - join of two
         List<Factor> new_factors_list = new ArrayList<>();
@@ -312,6 +315,7 @@ public class Variable_Elimination_Algo {
         return new_factors_list;
     }
 
+    //eliminate hidden from all factors
     private void eliminate(String hidden){ //what to get and return?
         System.out.println("eliminate");
         System.out.println("hidden:"+ hidden);
@@ -385,6 +389,7 @@ public class Variable_Elimination_Algo {
 
     }
 
+    //normalization - add all probability and divide each one by the sum
     private void normalization(){
         System.out.println("normalization");
         double sum_all = 0;

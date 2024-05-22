@@ -13,8 +13,8 @@ import org.w3c.dom.Node;
 
 public class Ex1 {
 
-    public static String bayes_ball_algo(String line){
-        Bayes_Ball_Algo bb = new Bayes_Ball_Algo(line);
+    public static String bayes_ball_algo(String line, NodeList net_file_nodeList){
+        Bayes_Ball_Algo bb = new Bayes_Ball_Algo(line, net_file_nodeList);
         //return yes or no
         return bb.run_algo();
     }
@@ -26,16 +26,16 @@ public class Ex1 {
 
     public static void main(String[] args) {
         try {
-            // Open the input file for reading
+            // open the input file for reading
             FileReader fileReader = new FileReader("input.txt");
             BufferedReader inputReader = new BufferedReader(fileReader);
 
-            // Create a File object for the output file
+            // create a File object for the output file
             File output_file = new File("output.txt");
-            // Create the output file with overwrite mode
+            // create the output file with overwrite mode
             FileOutputStream output_fos = new FileOutputStream(output_file, false);
 
-            // Read each line from the input file
+            // read each line from the input file
             String line = inputReader.readLine();
             //first line is the name of the basesian network file
             String base_net_file = line;
@@ -46,16 +46,16 @@ public class Ex1 {
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(base_netFile);
             doc.getDocumentElement().normalize();
-            NodeList net_file_nodeList = doc.getElementsByTagName("*"); // Get all elements
+            NodeList net_file_nodeList = doc.getElementsByTagName("*"); // get all elements
 
             //for each line in input file call the correct algo and write the output to the output file
             line = inputReader.readLine();
             while (line != null) {
-                // Check if the line starts with "P" then call the variable_elimination_algo
+                // check if the line starts with "P" then call the variable_elimination_algo
                 if (line.startsWith("P")) {
                     output_fos.write(variable_elimination_algo(line, net_file_nodeList).getBytes());
                 }else { //otherwise call the bayes_ball_algo
-                    output_fos.write(bayes_ball_algo(line).getBytes());
+                    output_fos.write(bayes_ball_algo(line, net_file_nodeList).getBytes());
                 }
                 //enter after any line except the last one
                 if ((line = inputReader.readLine()) != null){
@@ -63,11 +63,11 @@ public class Ex1 {
                 }
             }
 
-            // Close the input and output files
+            // close the input and output files
             inputReader.close();
             output_fos.close();
         } catch (ParserConfigurationException | SAXException | IOException e) {
-            // Handle any errors that occur
+            // handle any errors that occur
             e.printStackTrace();
         }
     }

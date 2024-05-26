@@ -27,8 +27,7 @@ public class Factor implements Comparable<Factor> {
         for (String var : this.variables_list) {
             if (var != null && var.length() == 1) {
                 char ch = var.charAt(0); // get the character
-                int asciiValue = (int) ch; // convert the character to its ASCII value
-                sum += asciiValue;
+                sum += ch;
             }
         }
         return sum;

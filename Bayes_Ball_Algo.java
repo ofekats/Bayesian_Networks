@@ -1,9 +1,6 @@
 import org.w3c.dom.NodeList;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Bayes_Ball_Algo {
     private String problem;
@@ -50,6 +47,38 @@ public class Bayes_Ball_Algo {
         }
     }
 
+    public String search(String var, String comefrom, String res){
+        System.out.println("searching");
+        System.out.println("res= " + res);
+        System.out.println("var= " + var);
+        System.out.println("target= " + this.target);
+        System.out.println("is var evidence? = " + this.evidence.contains(var));
+        if(this.evidence.contains(var) || comefrom.equals("CHILD")){ //if the var from evidence or from child go to parents only
+            for(Node_net par : this.nodes_map.get(var).get_parents())
+            {
+                if(par.get_node_var().equals(this.target)){
+                    res = "no";
+                }
+                if(search(par.get_node_var(), "CHILD", res).equals("no")){
+                    res = "no";
+                    break;
+                }
+            }
+        }else{ //if not from evidence and come from parent go to every child
+            for(Node_net child : this.nodes_map.get(var).get_children())
+            {
+                if(child.get_node_var().equals(this.target)){
+                    res = "no";
+                }
+                if(search(child.get_node_var(), "DAD", res).equals("no")){
+                    res = "no";
+                    break;
+                }
+            }
+        }
+        return res;
+    }
+
     public String run_algo(){
         //print
         System.out.println(" new problem base ball algo: ");
@@ -59,9 +88,8 @@ public class Bayes_Ball_Algo {
         System.out.println("evidence: " + evidence);
 
         this.create_nodes();
+        System.out.println("result: " + this.search(this.source,"DAD", "yes"));
 
-
-        String result = this.problem;
-        return result;
+        return this.search(this.source,"DAD", "yes");
     }
 }

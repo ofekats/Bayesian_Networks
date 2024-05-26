@@ -478,7 +478,7 @@ public class Variable_Elimination_Algo {
         this.normalization();
         System.out.println("\n");
         // create a DecimalFormat instance for 5 decimal places
-        DecimalFormat df = new DecimalFormat("#.#####");
+        DecimalFormat df = new DecimalFormat("0.00000");
         double res = 0;
         String needed = this.problem.substring(2,5);
         System.out.println("needed: " + needed);

@@ -129,8 +129,30 @@ public class Variable_Elimination_Algo {
             eliminate(var);
         }
         //remove all vars that independent of query by knowing evidence - baseball find then call eliminate
+        this.remove_vars_by_BaseBall();
     }
-        
+
+    //remove all vars that independent of query by knowing evidence - baseball find then call eliminate
+    private void remove_vars_by_BaseBall(){
+        String new_baseball_problem;
+        for(String hidden : this.hidden_vars_arr){
+            new_baseball_problem = "";
+            new_baseball_problem += this.query_var + "-" + hidden + "|";
+            for(String evidence : this.evidence_vars_dict.keySet()){
+                new_baseball_problem += evidence + "=" + this.evidence_vars_dict.get(evidence) + ",";
+            }
+            new_baseball_problem = new_baseball_problem.substring(0, new_baseball_problem.length()-1);
+            System.out.println("new_baseball_problem: " + new_baseball_problem);
+            Bayes_Ball_Algo bb = new Bayes_Ball_Algo(new_baseball_problem, net_file_nodeList);
+            //return yes or no
+            String result = bb.run_algo();
+            System.out.println("the result: " + result);
+            if(result.equals("yes"))
+            {
+                this.eliminate(hidden);
+            }
+        }
+    }
 
     //check if there are factors with one value and if so remove them
     private void remove_factors_with_one_val(){ 

@@ -26,11 +26,12 @@ public class Variable_Elimination_Algo {
     //get the query, evidence and hidden vars from the problem
     private void analyse_problem(){
         //query
-        this.query_var = problem.substring(2, 3);
+        this.query_var = problem.substring(this.problem.indexOf("P")+2, this.problem.indexOf("="));
         //evidence
         int index_end_evidence = problem.indexOf(")");
-        if(problem.length() > 6 && index_end_evidence > 6 ){
-            String evidence_str = problem.substring(6, index_end_evidence);
+        int index_start_evidence = problem.indexOf("|")+1;
+        if(problem.length() > index_start_evidence && index_end_evidence > index_start_evidence ){
+            String evidence_str = problem.substring(index_start_evidence, index_end_evidence);
             String[] evidence_str_parts = evidence_str.split(",");
             for(String evidence : evidence_str_parts){
                 String[] var_bool = evidence.split("=");
@@ -45,11 +46,7 @@ public class Variable_Elimination_Algo {
         }
 
         //for get_probability
-        if(evidence_vars_dict.size() != 1){
-            problem_vars = problem.substring(2,index_end_evidence);
-        }else{
-            problem_vars = problem.substring(2);
-        }
+        problem_vars = problem.substring(this.problem.indexOf("(")+1,index_end_evidence);
     }
 
     private void create_factors(){ 
@@ -130,6 +127,7 @@ public class Variable_Elimination_Algo {
         }
         //remove all vars that independent of query by knowing evidence - baseball find then call eliminate
         this.remove_vars_by_BaseBall();
+        this.count_add = 0;
     }
 
     //remove all vars that independent of query by knowing evidence - baseball find then call eliminate
@@ -215,7 +213,7 @@ public class Variable_Elimination_Algo {
         }
         System.out.println("end join");
         remove_factors_with_one_val();
-        if(hidden != this.query_var)
+        if(!hidden.equals(this.query_var))
         {
             this.eliminate(hidden);
         }
@@ -356,11 +354,12 @@ public class Variable_Elimination_Algo {
         // remove the factors to eliminate from the real factor list
         factors_list.removeAll(factors_to_eliminate);
 
-        Factor new_factor = new Factor();
+
         String hidden_options = "";
         // process each factor to eliminate
         for(Factor fac : factors_to_eliminate)
         {
+            Factor new_factor = new Factor();
             for(String var : fac.get_variables_list()) {
                 new_factor.add_to_variables_list(var);
             }
@@ -395,9 +394,9 @@ public class Variable_Elimination_Algo {
                 new_factor.add_to_values_to_map(var, to_add.get(var));
             }
             this.factors_list.remove(fac);
+            new_factor.remove_var_that_not_show();
+            this.factors_list.add(new_factor);
         }
-        new_factor.remove_var_that_not_show();
-        this.factors_list.add(new_factor);
 
 
         System.out.println("factors:");
@@ -459,11 +458,14 @@ public class Variable_Elimination_Algo {
                         flag_have_answer = 0;
                     }
                 }
-                if (flag_have_answer == 1){
-                    System.out.println("have the answer!");
-                    System.out.println("problem_vars: " + problem_vars);
-                    String result = fac.get_probability(problem_vars) + ",0,0";
-                    return result;
+                if (flag_have_answer == 1 && fac.get_variables_list().size() == 1+this.evidence_vars_dict.keySet().size()){
+                    if(fac.get_probability(problem_vars) != -1.0)
+                    {
+                        System.out.println("have the answer!");
+                        System.out.println("problem_vars: " + problem_vars);
+                        String result = fac.get_probability(problem_vars) + ",0,0";
+                        return result;
+                    }
                 }
                 flag_have_answer = 1;
             }

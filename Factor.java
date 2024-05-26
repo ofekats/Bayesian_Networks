@@ -66,7 +66,7 @@ public class Factor implements Comparable<Factor> {
                 return this.probabilities.get(vars);
             }
         }
-        return 0.0;
+        return -1.0;
     }
 
     public Map<String, List<String>> get_option_map()

@@ -10,6 +10,7 @@ public class Variable_Elimination_Algo {
     private String problem;
     String problem_vars;
     private String query_var;
+//    private String query_var_with_answer;
     private Map<String, String> evidence_vars_dict = new HashMap<>(); // for example B=T
     private String[] hidden_vars_arr;
     private List<Factor> factors_list = new LinkedList<>();
@@ -27,6 +28,8 @@ public class Variable_Elimination_Algo {
     private void analyse_problem(){
         //query
         this.query_var = problem.substring(this.problem.indexOf("P")+2, this.problem.indexOf("="));
+//        this.query_var_with_answer = problem.substring(this.problem.indexOf("P")+2, this.problem.indexOf("|"));
+//        System.out.println("query_var_with_answer: "+ query_var_with_answer);
         //evidence
         int index_end_evidence = problem.indexOf(")");
         int index_start_evidence = problem.indexOf("|")+1;
@@ -38,7 +41,7 @@ public class Variable_Elimination_Algo {
                 this.evidence_vars_dict.put(var_bool[0], var_bool[1]);
             }
         }
-        
+
         //hidden
         if(problem.length() > index_end_evidence+2){
             String hidden_str = problem.substring(index_end_evidence+2);
@@ -49,7 +52,7 @@ public class Variable_Elimination_Algo {
         problem_vars = problem.substring(this.problem.indexOf("(")+1,index_end_evidence);
     }
 
-    private void create_factors(){ 
+    private void create_factors(){
         System.out.println("create factors");
         factors_list = Base_net_handler.create_factors(net_file_nodeList);
 
@@ -64,6 +67,7 @@ public class Variable_Elimination_Algo {
         for (String evidence : evidence_vars_dict.keySet()) {
             for (Factor fac : factors_list) {
                 if (fac.is_var_in_factor(evidence)) {
+                    to_remove.clear();
                     for (String prob_vars : fac.get_probability_map().keySet()) {
                         String evidence_option = evidence + "=" + evidence_vars_dict.get(evidence);
     //                        System.out.println("evidence:" + evidence + " evidence_option: " + evidence_option);
@@ -76,6 +80,19 @@ public class Variable_Elimination_Algo {
                     }
                     fac.update_size();
                 }
+//                if(fac.is_var_in_factor(this.query_var)){
+//                    to_remove.clear();
+//                    for (String prob_vars : fac.get_probability_map().keySet()) {
+//                        String query_var_with_answer = problem.substring(this.problem.indexOf("P")+2, this.problem.indexOf("|"));
+//                        if (!prob_vars.contains(query_var_with_answer)) {
+//                            to_remove.add(prob_vars);
+//                        }
+//                    }
+//                    for (String remove : to_remove) {
+//                        fac.remove_from_probability_map(remove);
+//                    }
+//                    fac.update_size();
+//                }
             }
         }
 
@@ -90,31 +107,33 @@ public class Variable_Elimination_Algo {
         //add query and evidence to parent
         parents.add(this.query_var);
         parents.addAll(this.evidence_vars_dict.keySet());
-
-        for(Factor fac : this.factors_list)
-        {
-            List<String> add_to_parents = new ArrayList<>();
-            for(String par : parents)
-            {
-                if(fac.is_var_in_factor(par)){
+        List<String> add_to_parents = new ArrayList<>();
+        for(Factor fac : this.factors_list) {
+            System.out.println("before parents: " + parents);
+            System.out.println("fac.get_variables_list(): " + fac.get_variables_list());
+            for (String par : parents) {
+                if (fac.is_var_in_factor(par)) {
                     add_to_parents.addAll(fac.get_variables_list());
-                    for(Factor fac2 : this.factors_list)
-                    {
-                        for(String var : fac.get_variables_list()){
-                            if(fac2.is_var_in_factor(var)){
-                                add_to_parents.addAll(fac2.get_variables_list());
-                            }
-                        }
-                    }
+//                    for (Factor fac2 : this.factors_list) {
+//                        for (String var : fac.get_variables_list()) {
+//                            if (fac2.is_var_in_factor(var)) {
+//                                add_to_parents.addAll(fac2.get_variables_list());
+//                                System.out.println("fac2.get_variables_list(): " + fac2.get_variables_list());
+//                            }
+//                        }
+//                        System.out.println("add_to_parents: " + add_to_parents);
+//                    }
                 }
             }
-            parents.addAll(add_to_parents);
         }
+        parents.addAll(add_to_parents);
+        System.out.println("after parents: " + parents);
         List<String> to_eliminate = new ArrayList<>();
         for(Factor fac : this.factors_list)
         {
             for(String var : fac.get_variables_list())
             {
+                System.out.println("var: " + var);
                 if(!parents.contains(var)){
                     to_eliminate.add(var);
                 }
@@ -128,6 +147,7 @@ public class Variable_Elimination_Algo {
         //remove all vars that independent of query by knowing evidence - baseball find then call eliminate
         this.remove_vars_by_BaseBall();
         this.count_add = 0;
+        this.count_mul = 0;
     }
 
     //remove all vars that independent of query by knowing evidence - baseball find then call eliminate
@@ -153,7 +173,7 @@ public class Variable_Elimination_Algo {
     }
 
     //check if there are factors with one value and if so remove them
-    private void remove_factors_with_one_val(){ 
+    private void remove_factors_with_one_val(){
         System.out.println("remove factors with one val");
         List<Factor> factors_to_remove = new LinkedList<>();
         for(Factor fac : factors_list){
@@ -167,7 +187,7 @@ public class Variable_Elimination_Algo {
     }
 
     //join all the factors with the hidden value
-    private void join_factor(String hidden){ 
+    private void join_factor(String hidden){
         System.out.println("join");
         System.out.println("hidden:" + hidden);
         System.out.println("factors:");
@@ -193,6 +213,8 @@ public class Variable_Elimination_Algo {
             System.out.println("before while");
             while(new_factors.size() > 1)
             {
+                //sort the factors by size
+                Collections.sort(new_factors);
                 new_factors = the_joining(new_factors);
             }
 
@@ -220,119 +242,104 @@ public class Variable_Elimination_Algo {
     }
 
     //join a list of factors the sort by size or ascii sum (if size is equal)
-    private List<Factor> the_joining(List<Factor> factors_to_join){
+    private List<Factor> the_joining(List<Factor> factors_to_join) {
         //create new factor - join of two
-        List<Factor> new_factors_list = new ArrayList<>();
         Factor new_factor = new Factor();
 
         int factors_to_join_size = factors_to_join.size();
         System.out.println("before factors_to_join size: " + factors_to_join.size());
-
-        for(int i = 0; i < factors_to_join_size - 1; i+=2){
-
-            System.out.println("i:"+ i + ", factors_to_join size: " + factors_to_join.size());
-
-            //add the vars into the new factor - combine the two lists
-            for(String var : factors_to_join.get(i).get_variables_list()){
-                new_factor.add_to_variables_list(var);
-            }
-            for(String var : factors_to_join.get(i+1).get_variables_list()){
-                new_factor.add_to_variables_list(var);
-            }
-            //option list like in all the factors
-            new_factor.new_map_var_to_all_the_options(factors_to_join.get(i).get_option_map());
-            System.out.println("the new var list: " + new_factor.get_variables_list());
-
-            //add the new values
-            Map<String, Double> map1 = new HashMap<>();
-            Map<String, Double> map2 = new HashMap<>();
-            //map1 is bigger then map2
-            if(factors_to_join.get(i).get_probability_map().size() >=  factors_to_join.get(i+1).get_probability_map().size())
-            {
-                map1 = factors_to_join.get(i).get_probability_map();
-                map2 = factors_to_join.get(i+1).get_probability_map();
-            }else{
-                map1 = factors_to_join.get(i+1).get_probability_map();
-                map2 = factors_to_join.get(i).get_probability_map();
-            }
-
-            //the vars that in both of the list that needs to be matched for mul
-            List<String> var_the_same = new ArrayList<>(factors_to_join.get(i).get_variables_list());
-            var_the_same.retainAll(factors_to_join.get(i+1).get_variables_list());
-
-            //print
-            System.out.println("list1: "+ factors_to_join.get(i).get_variables_list());
-            System.out.println("map1: "+ map1);
-            System.out.println("list2: "+ factors_to_join.get(i+1).get_variables_list());
-            System.out.println("map2: "+ map2);
-            System.out.println("var_the_same: "+ var_the_same);
-
-
-            for(String var_from1 : map1.keySet())
-            {
-                //print
-                System.out.println("var_the_same: ");
-                for(String same_var : var_the_same){
-                    System.out.print(same_var + " ");
-                }
-                System.out.println();
-
-                //mul the correct values
-                List<String> need_to_have = new ArrayList<>();
-                for(String same_var : var_the_same){
-                    if(var_from1.contains(same_var)){
-                        int index_same = var_from1.indexOf(same_var);
-                        int last = index_same + 3;
-                        System.out.println("var: " + same_var+ ", var_from1: " + var_from1);
-                        System.out.println("index_same: " + index_same+ ", last: " + last);
-                        String need = "";
-                        if(var_from1.length() >= last){
-                            need = var_from1.substring(index_same, last);
-                        }
-                        System.out.println("need: " + need);
-                        need_to_have.add(need);
-                    }
-                }
-                int flag = 0;
-                double mul = map1.get(var_from1);
-                for(String var_from2 : map2.keySet()){
-                    System.out.println("var_from2: " + var_from2);
-                    for(String needed : need_to_have){
-                        if(!var_from2.contains(needed)){
-                            flag = 1;
-                            break;
-                        }
-                    }
-                    if(flag == 0){
-                        mul *= map2.get(var_from2);
-                        new_factor.add_to_values_to_map(var_from1 +","+ var_from2, mul);
-                        System.out.println("add_to_values_to_map: vars- " + var_from1 +","+ var_from2 + " value- " + mul);
-                        this.count_mul++;
-                        System.out.println("count_mul: " + count_mul);
-                    }
-                    flag = 0;
-                    mul = map1.get(var_from1);
-                }
-            }
-            System.out.println("new_factors_list");
-            new_factors_list.add(new_factor);
-
-            System.out.println("new factor");
-            System.out.println(new_factor);
-            System.out.println("factors_to_join.size(): " + factors_to_join.size());
+        //if there is only one factor
+        if(factors_to_join_size == 1){
+            return factors_to_join;
         }
+        System.out.println("factors_to_join size: " + factors_to_join.size());
+
+        new_factor = this.join_2_factors(factors_to_join.get(0), factors_to_join.get(1));
+        factors_to_join.remove(0);
+        factors_to_join.remove(0);
         System.out.println("after joining");
-        //if odd size need to add the last one too
-        if(factors_to_join.size() % 2 != 0){
-            new_factors_list.add(factors_to_join.get(factors_to_join.size()-1));
-        }
-        System.out.println("new_factors_list:");
-        for(Factor fac : new_factors_list) {
-            //print
-            System.out.println(fac);
+        factors_to_join.add(new_factor);
+            return factors_to_join;
         }
 
-        return new_factors_list;
+    private Factor join_2_factors(Factor f1, Factor f2){
+        Factor new_factor = new Factor();
+        //add the vars into the new factor - combine the two lists
+        for(String var : f1.get_variables_list()){
+            new_factor.add_to_variables_list(var);
+        }
+        for(String var : f2.get_variables_list()){
+            new_factor.add_to_variables_list(var);
+        }
+        //option list like in all the factors
+        new_factor.new_map_var_to_all_the_options(f1.get_option_map());
+        System.out.println("the new var list: " + new_factor.get_variables_list());
+
+        //add the new values
+        Map<String, Double> map1;
+        Map<String, Double> map2;
+        //map1 is bigger then map2
+        map1 = f1.get_probability_map();
+        map2 = f2.get_probability_map();
+        //the vars that in both of the list that needs to be matched for mul
+        List<String> var_the_same = new ArrayList<>(f1.get_variables_list());
+        var_the_same.retainAll(f2.get_variables_list());
+
+        //print
+        System.out.println("list1: "+ f1.get_variables_list());
+        System.out.println("map1: "+ map1);
+        System.out.println("list2: "+ f2.get_variables_list());
+        System.out.println("map2: "+ map2);
+        System.out.println("var_the_same: "+ var_the_same);
+
+
+        for(String var_from1 : map1.keySet())
+        {
+            //print
+            System.out.println("var_the_same: ");
+            for(String same_var : var_the_same){
+                System.out.print(same_var + " ");
+            }
+            System.out.println();
+
+            //mul the correct values
+            List<String> need_to_have = new ArrayList<>();
+            for(String same_var : var_the_same){
+                if(var_from1.contains(same_var)){
+                    int index_same = var_from1.indexOf(same_var);
+                    int last = index_same + 3;
+                    System.out.println("var: " + same_var+ ", var_from1: " + var_from1);
+                    System.out.println("index_same: " + index_same+ ", last: " + last);
+                    String need = "";
+                    if(var_from1.length() >= last){
+                        need = var_from1.substring(index_same, last);
+                    }
+                    System.out.println("need: " + need);
+                    need_to_have.add(need);
+                }
+            }
+            int flag = 0;
+            double mul = map1.get(var_from1);
+            for(String var_from2 : map2.keySet()){
+                System.out.println("var_from2: " + var_from2);
+                for(String needed : need_to_have){
+                    if(!var_from2.contains(needed)){
+                        flag = 1;
+                        break;
+                    }
+                }
+                if(flag == 0){
+                    mul *= map2.get(var_from2);
+                    new_factor.add_to_values_to_map(var_from1 +","+ var_from2, mul);
+                    System.out.println("add_to_values_to_map: vars- " + var_from1 +","+ var_from2 + " value- " + mul);
+                    this.count_mul++;
+                    System.out.println("count_mul: " + count_mul);
+                }
+                flag = 0;
+                mul = map1.get(var_from1);
+            }
+        }
+       return new_factor;
     }
 
     //eliminate hidden from all factors

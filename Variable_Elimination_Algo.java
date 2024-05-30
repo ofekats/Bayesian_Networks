@@ -358,8 +358,8 @@ public class Variable_Elimination_Algo {
         factors_to_join.remove(0);
         System.out.println("after joining");
         factors_to_join.add(new_factor);
-            return factors_to_join;
-        }
+        return factors_to_join;
+    }
 
     private Factor join_2_factors(Factor f1, Factor f2){
         Factor new_factor = new Factor();
@@ -401,18 +401,19 @@ public class Variable_Elimination_Algo {
         for(String var_from1 : map1.keySet())
         {
             //print
-            System.out.println("var_the_same: ");
-            for(String same_var : var_the_same){
-                System.out.print(same_var + " ");
-            }
-            System.out.println();
+            System.out.println("var_the_same: "+ var_the_same);
 
             //mul the correct values
             List<String> need_to_have = new ArrayList<>();
             for(String same_var : var_the_same){
                 if(var_from1.contains(same_var)){
-                    int index_same = var_from1.indexOf(same_var);
-                    int last = index_same + 3;
+                    int index_same = var_from1.indexOf(same_var+"=");
+                    int last;
+                    if(var_from1.replace("|",",").substring(index_same).contains(",")){
+                        last = index_same + var_from1.replace("|",",").substring(index_same).indexOf(",");
+                    }else{
+                        last = var_from1.length();
+                    }
                     System.out.println("var: " + same_var+ ", var_from1: " + var_from1);
                     System.out.println("index_same: " + index_same+ ", last: " + last);
                     String need = "";
@@ -493,7 +494,7 @@ public class Variable_Elimination_Algo {
                             this.count_add++;
                             System.out.println("count_add: " + count_add);
                         }else {
-                            if(no_hidden.contains(hidden)){
+                            if(no_hidden.contains(hidden+"=")){
                                 continue;
                             }
                             to_add.put(no_hidden, fac.get_probability_map().get(var));

@@ -10,9 +10,9 @@ public class Variable_Elimination_Algo {
     private String problem;
     String problem_vars;
     private String query_var;
-//    private String query_var_with_answer;
+    private String query_var_with_answer;
     private Map<String, String> evidence_vars_dict = new HashMap<>(); // for example B=T
-    private String[] hidden_vars_arr;
+    private List<String> hidden_vars_arr = new ArrayList<>();
     private List<Factor> factors_list = new LinkedList<>();
     private NodeList net_file_nodeList;
 
@@ -28,8 +28,8 @@ public class Variable_Elimination_Algo {
     private void analyse_problem(){
         //query
         this.query_var = problem.substring(this.problem.indexOf("P")+2, this.problem.indexOf("="));
-//        this.query_var_with_answer = problem.substring(this.problem.indexOf("P")+2, this.problem.indexOf("|"));
-//        System.out.println("query_var_with_answer: "+ query_var_with_answer);
+        this.query_var_with_answer = problem.substring(this.problem.indexOf("P")+2, this.problem.indexOf("|"));
+        System.out.println("query_var_with_answer: "+ query_var_with_answer);
         //evidence
         int index_end_evidence = problem.indexOf(")");
         int index_start_evidence = problem.indexOf("|")+1;
@@ -45,7 +45,10 @@ public class Variable_Elimination_Algo {
         //hidden
         if(problem.length() > index_end_evidence+2){
             String hidden_str = problem.substring(index_end_evidence+2);
-            this.hidden_vars_arr = hidden_str.split("-");
+            String[] hidden_arr = hidden_str.split("-");
+            for(String hid : hidden_arr){
+                this.hidden_vars_arr.add(hid);
+            }
         }
 
         //for get_probability
@@ -157,6 +160,7 @@ public class Variable_Elimination_Algo {
     //remove all vars that independent of query by knowing evidence - baseball find then call eliminate
     private void remove_vars_by_BaseBall(){
         String new_baseball_problem;
+        List<String> to_remove_var = new ArrayList<>();
         //hidden
         for(String hidden : this.hidden_vars_arr){
             new_baseball_problem = "";
@@ -173,6 +177,7 @@ public class Variable_Elimination_Algo {
             if(result.equals("yes"))
             {
 //                this.eliminate(hidden);
+                to_remove_var.add(hidden);
                 List<Factor> to_rem = new ArrayList<>();
                 for(Factor fac : this.factors_list)
                 {
@@ -187,7 +192,12 @@ public class Variable_Elimination_Algo {
                 }
             }
         }
+        for(String remove_hidden : to_remove_var)
+        {
+            this.hidden_vars_arr.remove(remove_hidden);
+        }
         //evidence
+        to_remove_var.clear();
         for(String evid : this.evidence_vars_dict.keySet()){
             new_baseball_problem = "";
             new_baseball_problem += this.query_var + "-" + evid + "|";
@@ -207,6 +217,7 @@ public class Variable_Elimination_Algo {
             if(result.equals("yes"))
             {
 //                this.eliminate(hidden);
+                to_remove_var.add(evid);
                 List<Factor> to_rem = new ArrayList<>();
                 for(Factor fac : this.factors_list)
                 {
@@ -221,7 +232,10 @@ public class Variable_Elimination_Algo {
                 }
             }
         }
-
+        for(String remove_evidence : to_remove_var)
+        {
+            this.evidence_vars_dict.remove(remove_evidence);
+        }
     }
 
     //check if there are factors with one value and if so remove them
@@ -489,6 +503,10 @@ public class Variable_Elimination_Algo {
     }
 
     public String run_algo(){
+
+        // create a DecimalFormat instance for 5 decimal places
+        DecimalFormat df = new DecimalFormat("0.00000");
+
         //prints
         System.out.println("\n  new problem--- ");
         System.out.println("problem: " + problem);
@@ -522,8 +540,17 @@ public class Variable_Elimination_Algo {
                     {
                         System.out.println("have the answer!");
                         System.out.println("problem_vars: " + problem_vars);
-                        String result = fac.get_probability(problem_vars) + ",0,0";
+                        String result = df.format(fac.get_probability(problem_vars)) + ",0,0";
                         return result;
+                    }
+                    if(this.evidence_vars_dict.keySet().size() == 0){
+                        if(fac.get_probability(this.query_var_with_answer) != -1.0)
+                        {
+                            System.out.println("have the answer!");
+                            System.out.println("this.query_var_with_answer: " + this.query_var_with_answer);
+                            String result = df.format(fac.get_probability(this.query_var_with_answer)) + ",0,0";
+                            return result;
+                        }
                     }
                 }
                 flag_have_answer = 1;
@@ -536,8 +563,6 @@ public class Variable_Elimination_Algo {
         this.join_factor(this.query_var);
         this.normalization();
         System.out.println("\n");
-        // create a DecimalFormat instance for 5 decimal places
-        DecimalFormat df = new DecimalFormat("0.00000");
         double res = 0;
         String needed = this.problem.substring(2,5);
         System.out.println("needed: " + needed);

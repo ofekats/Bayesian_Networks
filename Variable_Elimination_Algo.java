@@ -111,14 +111,23 @@ public class Variable_Elimination_Algo {
         parents.add(this.query_var);
         parents.addAll(this.evidence_vars_dict.keySet());
         List<String> add_to_parents = new ArrayList<>();
-        for(Factor fac : this.factors_list) {
-            System.out.println("before parents: " + parents);
-            System.out.println("fac.get_variables_list(): " + fac.get_variables_list());
-            for (String par : parents) {
-                if (fac.is_var_in_factor(par)) {
-                    add_to_parents.addAll(fac.get_variables_list());
-                }
+//        for(Factor fac : this.factors_list) {
+//            System.out.println("before parents: " + parents);
+//            System.out.println("fac.get_variables_list(): " + fac.get_variables_list());
+//            for (String par : parents) {
+//                if (fac.is_var_in_factor(par)) {
+//                    add_to_parents.addAll(fac.get_variables_list());
+//                }
+//            }
+//        }
+        Map<String, Node_net> new_nodes = Base_net_handler.create_nodes(this.net_file_nodeList);
+        for(String node : new_nodes.keySet())
+        {
+            for(Node_net par_node : new_nodes.get(node).get_parents()){
+                add_to_parents.add(par_node.get_node_var());
             }
+            add_to_parents = get_parents(new_nodes.get(node), add_to_parents);
+            //?????
         }
         parents.addAll(add_to_parents);
         System.out.println("after parents: " + parents);
@@ -155,6 +164,27 @@ public class Variable_Elimination_Algo {
         this.remove_vars_by_BaseBall();
         this.count_add = 0;
         this.count_mul = 0;
+    }
+
+    private List<String> get_parents(Node_net node, List<String> parents)
+    {
+        List<String> add_to_parents = new ArrayList<>();
+        for (String par : parents) {
+            if (node.get_node_var().equals(par)) {
+                for(Node_net n : node.get_parents()){
+                    add_to_parents.add(n.get_node_var());
+                    if(!n.get_parents().isEmpty())
+                    {
+                        for(Node_net n_par : n.get_parents()){
+                            add_to_parents.addAll(parents);
+                            get_parents(n_par, add_to_parents);
+                        }
+                    }
+                }
+            }
+        }
+        parents.addAll(add_to_parents);
+        return parents;
     }
 
     //remove all vars that independent of query by knowing evidence - baseball find then call eliminate

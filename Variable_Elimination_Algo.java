@@ -171,7 +171,19 @@ public class Variable_Elimination_Algo {
             System.out.println("the result: " + result);
             if(result.equals("yes"))
             {
-                this.eliminate(hidden);
+//                this.eliminate(hidden);
+                List<Factor> to_rem = new ArrayList<>();
+                for(Factor fac : this.factors_list)
+                {
+                    if(fac.is_var_in_factor(hidden))
+                    {
+                        to_rem.add(fac);
+                    }
+                }
+                for(Factor fac : to_rem)
+                {
+                    this.factors_list.remove(fac);
+                }
             }
         }
     }

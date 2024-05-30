@@ -532,8 +532,9 @@ public class Variable_Elimination_Algo {
             {
                 for(String var : fac.get_probability_map().keySet()){
                     sum_all += fac.get_probability_map().get(var);
+                    this.count_add++;
                 }
-                this.count_add++;
+                this.count_add--;
                 System.out.println("count_add: "+ count_add);
                 for(String var : fac.get_probability_map().keySet()){
                     fac.get_probability_map().put(var,fac.get_probability_map().get(var) / sum_all);
@@ -575,14 +576,12 @@ public class Variable_Elimination_Algo {
                         flag_have_answer = 0;
                     }
                 }
+                System.out.println("flag_have_answer: " + flag_have_answer);
+                System.out.println("this.evidence_vars_dict.keySet().size(): " + this.evidence_vars_dict.keySet().size());
                 if (flag_have_answer == 1 && fac.get_variables_list().size() == 1+this.evidence_vars_dict.keySet().size()){
-                    if(fac.get_probability(problem_vars) != -1.0)
-                    {
-                        System.out.println("have the answer!");
-                        System.out.println("problem_vars: " + problem_vars);
-                        String result = df.format(fac.get_probability(problem_vars)) + ",0,0";
-                        return result;
-                    }
+                    System.out.println("problem_vars: " + problem_vars);
+                    System.out.println("fac.get_probability(problem_vars): " + fac.get_probability(problem_vars));
+                    System.out.println("fac.get_probability_map(): " + fac.get_probability_map());
                     if(this.evidence_vars_dict.keySet().size() == 0){
                         if(fac.get_probability(this.query_var_with_answer) != -1.0)
                         {
@@ -590,6 +589,35 @@ public class Variable_Elimination_Algo {
                             System.out.println("this.query_var_with_answer: " + this.query_var_with_answer);
                             String result = df.format(fac.get_probability(this.query_var_with_answer)) + ",0,0";
                             return result;
+                        }
+                    }
+                    double probability = fac.get_probability(problem_vars);
+                    if(probability != -1.0)
+                    {
+                        System.out.println("have the answer!");
+                        System.out.println("problem_vars: " + problem_vars);
+                        String result = df.format(probability) + ",0,0";
+                        return result;
+                    }else{
+                        System.out.println("prob equal -1.0!!!");
+                        int flag = 1;
+                        String[] need_to_have = problem_vars.replace("|",",").split(",");
+                        need_to_have[0] = need_to_have[0]+"|";
+                        String vars_prob = "";
+                        for(String vars : fac.get_probability_map().keySet()){
+                            vars_prob = vars;
+                            System.out.println("vars_prob: "+vars_prob);
+                            for(String need : need_to_have){
+                                System.out.println("need: "+need);
+                                if(!vars.contains(need)){
+                                    flag = 0;
+                                    break;
+                                }
+                            }
+                            if(flag == 1 && fac.get_probability(vars_prob) != -1.0){
+                                String result = df.format(fac.get_probability(vars_prob)) + ",0,0";
+                                return result;
+                            }
                         }
                     }
                 }

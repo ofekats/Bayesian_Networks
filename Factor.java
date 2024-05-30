@@ -69,6 +69,15 @@ public class Factor implements Comparable<Factor> {
         return -1.0;
     }
 
+    public String get_var_by_probability(Double prob){
+        for(String vars : this.probabilities.keySet()){
+            if(this.probabilities.get(vars) == prob){
+                return vars;
+            }
+        }
+        return "";
+    }
+
     public Map<String, List<String>> get_option_map()
     {
         return this.map_var_to_all_the_options;

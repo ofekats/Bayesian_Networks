@@ -157,6 +157,7 @@ public class Variable_Elimination_Algo {
     //remove all vars that independent of query by knowing evidence - baseball find then call eliminate
     private void remove_vars_by_BaseBall(){
         String new_baseball_problem;
+        //hidden
         for(String hidden : this.hidden_vars_arr){
             new_baseball_problem = "";
             new_baseball_problem += this.query_var + "-" + hidden + "|";
@@ -186,6 +187,41 @@ public class Variable_Elimination_Algo {
                 }
             }
         }
+        //evidence
+        for(String evid : this.evidence_vars_dict.keySet()){
+            new_baseball_problem = "";
+            new_baseball_problem += this.query_var + "-" + evid + "|";
+            for(String evidence : this.evidence_vars_dict.keySet()){
+                if(!evidence.equals(evid)){
+                    new_baseball_problem += evidence + "=" + this.evidence_vars_dict.get(evidence) + ",";
+                }
+            }
+            if(new_baseball_problem.contains(",")){
+                new_baseball_problem = new_baseball_problem.substring(0, new_baseball_problem.length()-1);
+            }
+            System.out.println("new_baseball_problem: " + new_baseball_problem);
+            Bayes_Ball_Algo bb = new Bayes_Ball_Algo(new_baseball_problem, net_file_nodeList);
+            //return yes or no
+            String result = bb.run_algo();
+            System.out.println("the result: " + result);
+            if(result.equals("yes"))
+            {
+//                this.eliminate(hidden);
+                List<Factor> to_rem = new ArrayList<>();
+                for(Factor fac : this.factors_list)
+                {
+                    if(fac.is_var_in_factor(evid))
+                    {
+                        to_rem.add(fac);
+                    }
+                }
+                for(Factor fac : to_rem)
+                {
+                    this.factors_list.remove(fac);
+                }
+            }
+        }
+
     }
 
     //check if there are factors with one value and if so remove them

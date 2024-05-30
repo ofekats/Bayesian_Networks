@@ -12,7 +12,7 @@ public class Variable_Elimination_Algo {
     private String query_var;
     private String query_var_with_answer;
     private Map<String, String> evidence_vars_dict = new HashMap<>(); // for example B=T
-    private List<String> hidden_vars_arr = new ArrayList<>();
+    private List<String> hidden_vars_list = new ArrayList<>();
     private List<Factor> factors_list = new LinkedList<>();
     private NodeList net_file_nodeList;
 
@@ -47,7 +47,7 @@ public class Variable_Elimination_Algo {
             String hidden_str = problem.substring(index_end_evidence+2);
             String[] hidden_arr = hidden_str.split("-");
             for(String hid : hidden_arr){
-                this.hidden_vars_arr.add(hid);
+                this.hidden_vars_list.add(hid);
             }
         }
 
@@ -73,7 +73,7 @@ public class Variable_Elimination_Algo {
                     to_remove.clear();
                     for (String prob_vars : fac.get_probability_map().keySet()) {
                         String evidence_option = evidence + "=" + evidence_vars_dict.get(evidence);
-    //                        System.out.println("evidence:" + evidence + " evidence_option: " + evidence_option);
+                            System.out.println("evidence:" + evidence + " evidence_option: " + evidence_option);
                         if (!prob_vars.contains(evidence_option)) {
                             to_remove.add(prob_vars);
                         }
@@ -147,6 +147,8 @@ public class Variable_Elimination_Algo {
         for(String var : to_eliminate)
         {
 //            eliminate(var);
+            this.evidence_vars_dict.remove(var);
+            this.hidden_vars_list.remove(var);
             List<Factor> to_rem = new ArrayList<>();
             for(Factor fac : this.factors_list)
             {
@@ -193,7 +195,7 @@ public class Variable_Elimination_Algo {
         String new_baseball_problem;
         List<String> to_remove_var = new ArrayList<>();
         //hidden
-        for(String hidden : this.hidden_vars_arr){
+        for(String hidden : this.hidden_vars_list){
             new_baseball_problem = "";
             new_baseball_problem += this.query_var + "-" + hidden + "|";
             for(String evidence : this.evidence_vars_dict.keySet()){
@@ -225,7 +227,7 @@ public class Variable_Elimination_Algo {
         }
         for(String remove_hidden : to_remove_var)
         {
-            this.hidden_vars_arr.remove(remove_hidden);
+            this.hidden_vars_list.remove(remove_hidden);
         }
         //evidence
         to_remove_var.clear();
@@ -381,6 +383,12 @@ public class Variable_Elimination_Algo {
         //the vars that in both of the list that needs to be matched for mul
         List<String> var_the_same = new ArrayList<>(f1.get_variables_list());
         var_the_same.retainAll(f2.get_variables_list());
+
+        for(String evid : this.evidence_vars_dict.keySet()){
+            if(var_the_same.contains(evid)){
+                var_the_same.remove(evid);
+            }
+        }
 
         //print
         System.out.println("list1: "+ f1.get_variables_list());
@@ -544,7 +552,7 @@ public class Variable_Elimination_Algo {
         System.out.println("query var: " + query_var);
         System.out.println("evidence_vars_dict: " + evidence_vars_dict);
         System.out.print("hidden_vars_arr: ");
-        for (String val : hidden_vars_arr){
+        for (String val : hidden_vars_list){
             System.out.print(val + " ");
         }
         System.out.println();
@@ -588,7 +596,7 @@ public class Variable_Elimination_Algo {
             }
         }
 
-        for (String hidden : hidden_vars_arr){
+        for (String hidden : hidden_vars_list){
             this.join_factor(hidden); //in join call eliminate with the hidden value
         }
         this.join_factor(this.query_var);

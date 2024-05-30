@@ -123,11 +123,12 @@ public class Variable_Elimination_Algo {
         Map<String, Node_net> new_nodes = Base_net_handler.create_nodes(this.net_file_nodeList);
         for(String node : new_nodes.keySet())
         {
-            for(Node_net par_node : new_nodes.get(node).get_parents()){
-                add_to_parents.add(par_node.get_node_var());
+            if(parents.contains(node)){
+                for(Node_net par_node : new_nodes.get(node).get_parents()){
+                    parents.add(par_node.get_node_var());
+                }
+                add_to_parents.addAll(get_parents(new_nodes.get(node), parents));
             }
-            add_to_parents = get_parents(new_nodes.get(node), add_to_parents);
-            //?????
         }
         parents.addAll(add_to_parents);
         System.out.println("after parents: " + parents);
@@ -168,22 +169,22 @@ public class Variable_Elimination_Algo {
 
     private List<String> get_parents(Node_net node, List<String> parents)
     {
+        System.out.println("get_parents");
+        System.out.println("node: " + node.get_node_var());
+        System.out.println("parents: " + parents);
         List<String> add_to_parents = new ArrayList<>();
-        for (String par : parents) {
-            if (node.get_node_var().equals(par)) {
-                for(Node_net n : node.get_parents()){
-                    add_to_parents.add(n.get_node_var());
-                    if(!n.get_parents().isEmpty())
-                    {
-                        for(Node_net n_par : n.get_parents()){
-                            add_to_parents.addAll(parents);
-                            get_parents(n_par, add_to_parents);
-                        }
-                    }
-                }
+        add_to_parents.add(node.get_node_var());
+        for(Node_net node_dad : node.get_parents()){
+            add_to_parents.add(node_dad.get_node_var());
+            for(Node_net node_grandad : node_dad.get_parents()){
+                add_to_parents.addAll(parents);
+                add_to_parents.add(node_dad.get_node_var());
+                System.out.println("add_to_parents: " + add_to_parents);
+                add_to_parents.addAll(get_parents(node_grandad, add_to_parents));
             }
         }
         parents.addAll(add_to_parents);
+        System.out.println("add_to_parents: " + add_to_parents);
         return parents;
     }
 

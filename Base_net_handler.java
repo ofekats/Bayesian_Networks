@@ -1,17 +1,18 @@
 import java.util.*;
-
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+//this class read from the XML file of the bayesian network
+//help take the necessary information for creating Factors or Nodes
 public class Base_net_handler {
 
     //help function to get the permutation as needed
-    //move the first element of list to be the last
+    //to move the first element of list to be the last
     public static List<String> moveFirstToLast(List<String> variables_list) {
-        if (!variables_list.isEmpty()) { // check if the list is not empty
-            String firstVar = variables_list.remove(0); // remove the first variable
-            variables_list.add(firstVar); // add the first variable to the end
+        if (!variables_list.isEmpty()) {
+            String firstVar = variables_list.remove(0);
+            variables_list.add(firstVar);
         }
         return variables_list;
     }
@@ -39,27 +40,27 @@ public class Base_net_handler {
             current.remove(current.size() - 1);
         }
     }
-    
+
+    //create a map of key:variables, value: all the variable option to be (for example - T/F)
+    //from the bayesian network xml file
     private static Map<String, List<String>> help_map_option(NodeList net_file_nodeList){
         //for each var what are his options (for example - T/F or 0/1/2)
         Map<String, List<String>> map_var_to_all_the_options = new HashMap<>();
         String name = "";
         List<String> options = new ArrayList<>();
-        // Loop through each element
+        // loop through each element
         for (int temp = 0; temp < net_file_nodeList.getLength(); temp++) {
-            // Process your XML nodes here
             Node node = net_file_nodeList.item(temp);
             if (node.getNodeType() == Node.ELEMENT_NODE) {
                 Element definitionElement = (Element) node;
                 if (definitionElement.getTagName().equals("VARIABLE")) {
-                    // Get child elements within "VARIABLE"
                     NodeList childNodes = definitionElement.getChildNodes();
-                    // Loop over child elements
+                    //lLoop over child elements
                     for (int j = 0; j < childNodes.getLength(); j++) {
                         Node childNode = childNodes.item(j);
                         if (childNode.getNodeType() == Node.ELEMENT_NODE) {
                             Element childElement = (Element) childNode;
-                            // Check for "for", "table", and "given" elements
+                            // check for "NAME" and "OUTCOME" elements
                             if (childElement.getTagName().equals("NAME")) {
                                 name = childElement.getTextContent();
                             }
@@ -75,29 +76,30 @@ public class Base_net_handler {
         }
         return map_var_to_all_the_options;
     }
+
+    //create all the factors for the VE algo to use
+    //from the bayesian network xml file
     public static List<Factor> create_factors(NodeList net_file_nodeList){
         //for each var what are his options (for example - T/F or 0/1/2)
         Map<String, List<String>> map_var_to_all_the_options = help_map_option(net_file_nodeList);
 
         //create factors
         List<Factor> factors_list = new LinkedList<>();
-        // Loop through each element
+        // loop through each element
         for (int temp = 0; temp < net_file_nodeList.getLength(); temp++) {
-            // Process your XML nodes here
             Node node = net_file_nodeList.item(temp);
             if (node.getNodeType() == Node.ELEMENT_NODE) {
                 Element definitionElement = (Element) node;
                 if (definitionElement.getTagName().equals("DEFINITION")) {
                     Factor new_factor = new Factor();
                     new_factor.new_map_var_to_all_the_options(map_var_to_all_the_options);
-                    // Get child elements within "DEFINITION"
                     NodeList childNodes = definitionElement.getChildNodes();
-                    // Loop over child elements
+                    // loop over child elements
                     for (int j = 0; j < childNodes.getLength(); j++) {
                         Node childNode = childNodes.item(j);
                         if (childNode.getNodeType() == Node.ELEMENT_NODE) {
                             Element childElement = (Element) childNode;
-                            // Check for "for", "table", and "given" elements
+                            // check for "FOR", "GIVEN", and "TABLE" elements
                             if (childElement.getTagName().equals("FOR") ||
                                 childElement.getTagName().equals("GIVEN")) {
                                 new_factor.add_to_variables_list(childElement.getTextContent());
@@ -107,7 +109,7 @@ public class Base_net_handler {
                                 String[] values_parts = values.split(" ");
                                 List<String> vars = moveFirstToLast(new_factor.get_variables_list());
                                 List<List<String>> perList = generatePermutations(vars, map_var_to_all_the_options);
-
+                                //make the probability map of key: variables options, value: the probability
                                 for (int i = 0; i < perList.size(); i++) {
                                     try {
                                         double doubleValue = Double.parseDouble(values_parts[i]);
@@ -123,11 +125,11 @@ public class Base_net_handler {
                                         else{
                                             res = vars.get(k) + "=" + perList.get(i).get(k);
                                         }
-                                        // Add the double value to your list
+                                        // add the double value to your list
                                         new_factor.add_to_values_to_map(res,doubleValue);
 
                                     } catch (NumberFormatException e) {
-                                        // Handle the case where the value cannot be parsed as a double
+                                        // handle the case where the value cannot be parsed as a double
                                         System.err.println("Failed to parse value as double: " + values_parts[i]);
                                     }
                                 }
@@ -143,6 +145,8 @@ public class Base_net_handler {
     }
 
 
+    //create all the nodes for the BaseBall algo to use
+    //from the bayesian network xml file
     public static Map<String, Node_net> create_nodes(NodeList net_file_nodeList){
         Map<String, Node_net> new_node_map = new HashMap<>();
         //for each var what are his options (for example - T/F or 0/1/2)
@@ -155,36 +159,34 @@ public class Base_net_handler {
         }
 
         //search for children and parents
-        // Loop through each element
+        // loop through each element
         for (int temp = 0; temp < net_file_nodeList.getLength(); temp++) {
-            // Process your XML nodes here
             Node node = net_file_nodeList.item(temp);
-            String name = "";
+            String this_var = "";
             String parent = "";
             if (node.getNodeType() == Node.ELEMENT_NODE) {
                 Element definitionElement = (Element) node;
                 if (definitionElement.getTagName().equals("DEFINITION")) {
-                    // Get child elements within "DEFINITION"
                     NodeList childNodes = definitionElement.getChildNodes();
-                    // Loop over child elements
+                    // loop over child elements
                     for (int j = 0; j < childNodes.getLength(); j++) {
                         Node childNode = childNodes.item(j);
                         if (childNode.getNodeType() == Node.ELEMENT_NODE) {
                             Element childElement = (Element) childNode;
-                            // Check for "for" elements
+                            // check for "FOR" elements
                             if (childElement.getTagName().equals("FOR")) {
-                                name = childElement.getTextContent();
+                                this_var = childElement.getTextContent();
                             }
-                            // Check for "given" elements
+                            // check for "GIVEN" elements
                             if (childElement.getTagName().equals("GIVEN")) {
                                 parent = childElement.getTextContent();
                                 for(String var_node : new_node_map.keySet())
                                 {
                                     if(var_node.equals(parent)){
-                                        //add name to be the child of parent
-                                        new_node_map.get(var_node).add_to_children(new_node_map.get(name));
-                                        //add parent to be the parent of name
-                                        new_node_map.get(name).add_to_parents(new_node_map.get(var_node));
+                                        //add this_var to be the child of parent
+                                        new_node_map.get(var_node).add_to_children(new_node_map.get(this_var));
+                                        //add parent to be the parent of this_var
+                                        new_node_map.get(this_var).add_to_parents(new_node_map.get(var_node));
                                     }
                                 }
                             }

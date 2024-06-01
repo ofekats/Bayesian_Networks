@@ -1,6 +1,5 @@
 import java.text.DecimalFormat;
 import java.util.*;
-
 import org.w3c.dom.NodeList;
 
 public class Variable_Elimination_Algo {

@@ -1,6 +1,8 @@
 import java.util.ArrayList;
 import java.util.List;
 
+//class of node for the BaseBall algo
+//each node contain (1)the var, (2)parents list, (3)children list
 public class Node_net {
     private String var;
     private List<Node_net> parents = new ArrayList<>();

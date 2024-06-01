@@ -9,16 +9,19 @@ import javax.xml.parsers.DocumentBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import org.w3c.dom.Node;
 
+//the main class of the assignment - read the input file line by line
+//call the correct algo and put the result in an output file
 public class Ex1 {
 
+    //call the BaseBall algo
     public static String bayes_ball_algo(String line, NodeList net_file_nodeList){
         Bayes_Ball_Algo bb = new Bayes_Ball_Algo(line, net_file_nodeList);
         //return yes or no
         return bb.run_algo();
     }
 
+    //call the variable elimination algo
     public static String variable_elimination_algo(String line, NodeList net_file_nodeList){
         Variable_Elimination_Algo ve = new Variable_Elimination_Algo(line, net_file_nodeList);
         return ve.run_algo();
@@ -37,7 +40,7 @@ public class Ex1 {
 
             // read each line from the input file
             String line = inputReader.readLine();
-            //first line is the name of the basesian network file
+            //first line is the name of the bayesian network file
             String base_net_file = line;
 
             //open bayesian network file

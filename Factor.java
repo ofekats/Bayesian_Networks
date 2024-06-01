@@ -2,7 +2,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.*;
 
 public class Factor implements Comparable<Factor> {
     private Map<String, List<String>> map_var_to_all_the_options = new HashMap<>();

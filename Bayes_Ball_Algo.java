@@ -45,15 +45,8 @@ public class Bayes_Ball_Algo {
     //using the Base_net_handler class to help creating the nodes
     public void create_nodes()
     {
-//        System.out.println("create nodes");
         this.nodes_map = Base_net_handler.create_nodes(net_file_nodeList);
 
-//        //print
-//        System.out.println("nodes: ");
-//        for (String node : this.nodes_map.keySet())
-//        {
-//            System.out.println(this.nodes_map.get(node));
-//        }
     }
 
     //the main part of the algo
@@ -65,11 +58,6 @@ public class Bayes_Ball_Algo {
     //if gets to the target in each point return "no" because the source and the target are not independent
     //otherwise return "yes" because the source and the target are independent
     public String search(String var, String comefrom, String res, List<String> already_checked){
-//        System.out.println("searching");
-//        System.out.println("res= " + res);
-//        System.out.println("var= " + var);
-//        System.out.println("target= " + this.target);
-//        System.out.println("is var evidence? = " + this.evidence.contains(var));
         if(res.equals("no"))
         {
             return res;
@@ -79,7 +67,6 @@ public class Bayes_Ball_Algo {
         }
         if(this.evidence.contains(var)){ //if the var from evidence
             if(comefrom.equals("DAD")){ //if come from parent go to every parent
-//                System.out.println("var from evidence and come from parent go to every parent");
                 for(Node_net par : this.nodes_map.get(var).get_parents())
                 {
                     if(par.get_node_var().equals(this.target)){
@@ -91,12 +78,10 @@ public class Bayes_Ball_Algo {
                     }
                 }
             }else{ //if come from child stop
-//                System.out.println("var from evidence and come from child stop");
                 return res;
             }
         }else{ //if not from evidence
             if(comefrom.equals("DAD")){ //if come from parent go to every child
-//                System.out.println("var not from evidence and come from parent go to every child");
                 if(this.nodes_map.get(var).get_children().isEmpty())
                 {
                     res = "yes";
@@ -114,7 +99,6 @@ public class Bayes_Ball_Algo {
             }else{ //if come from child go to every child and every parent
                 //to not run forever if already check that var not to do that again
                 already_checked.add(var);
-//                System.out.println("var not from evidence and come from child go to every child and every parent");
                 for(Node_net par : this.nodes_map.get(var).get_parents())
                 {
                     if(par.get_node_var().equals(this.target)){
@@ -145,12 +129,6 @@ public class Bayes_Ball_Algo {
     //(2) start from the source (as it came from the child) and get the result
     //(3) return result
     public String run_algo(){
-//        //print
-//        System.out.println(" new problem base ball algo: ");
-//        System.out.println("problem: " + problem);
-//        System.out.println("source: " + source);
-//        System.out.println("target: " + target);
-//        System.out.println("evidence: " + evidence);
 
         this.create_nodes();
         List<String> already_checked = new ArrayList<>();
@@ -158,7 +136,6 @@ public class Bayes_Ball_Algo {
         if (result.equals("")){
             return "no";
         }
-//        System.out.println("result: " + result);
         return result;
     }
 }

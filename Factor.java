@@ -3,15 +3,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+//class of factors for the Variable Elimination algo
+//each factor contain (1)map of option- key:variable, value:all the variable option (for example {A:T,F}),
+//                    (2)list of all the variables in this factor,
+//                    (3)map of probability- key:the variables and options, value:the probability (for example {J=T|A=T: 0.9}),
+//                    (4)size of the probability table
+//this class implement Comparable to compare factors by size
 public class Factor implements Comparable<Factor> {
-    private Map<String, List<String>> map_var_to_all_the_options = new HashMap<>();
+    private Map<String, List<String>> map_var_to_all_the_options = new HashMap<>(); //for example {A:T,F}
     private List<String> variables_list = new ArrayList<>();
-    private Map<String, Double> probabilities = new HashMap<>();
+    private Map<String, Double> probabilities = new HashMap<>(); //for example {J=T|A=T: 0.9}
     int size;
 
     public Factor()
     {this.size = 0;}
 
+    //for the join: the factors need to be from the smallest to the largest size
+    //if the size is equal: they will be ordered by the sum of the ASCII values of the factor's variables (from smallest to largest)
     public int compareTo(Factor other) {
         if(this.size != other.size){
             return Integer.compare(this.size, other.size);
@@ -25,12 +33,14 @@ public class Factor implements Comparable<Factor> {
         int sum = 0;
         for (String var : this.variables_list) {
             if (var != null && var.length() == 1) {
-                char ch = var.charAt(0); // get the character
+                char ch = var.charAt(0);
                 sum += ch;
             }
         }
         return sum;
     }
+
+    //create the map using an already existing map
     public void new_map_var_to_all_the_options(Map<String, List<String>> new_map)
     {
         this.map_var_to_all_the_options = new_map;
@@ -57,6 +67,7 @@ public class Factor implements Comparable<Factor> {
         return this.variables_list;
     }
 
+    //return the probability or if it doesn't exist return -1.0
     public Double get_probability(String vars){
         for(String vals_and_option : this.probabilities.keySet())
         {
@@ -68,15 +79,6 @@ public class Factor implements Comparable<Factor> {
         return -1.0;
     }
 
-    public String get_var_by_probability(Double prob){
-        for(String vars : this.probabilities.keySet()){
-            if(this.probabilities.get(vars) == prob){
-                return vars;
-            }
-        }
-        return "";
-    }
-
     public Map<String, List<String>> get_option_map()
     {
         return this.map_var_to_all_the_options;
@@ -86,13 +88,14 @@ public class Factor implements Comparable<Factor> {
         return this.probabilities;
     }
 
+    public int get_size(){
+        return this.size;
+    }
+
     public void remove_from_probability_map(String vars){
         this.probabilities.remove(vars);
     }
 
-    public void remove_var_from_variables_list(String var){
-        this.variables_list.remove(var);
-    }
     public void remove_var_that_not_show(){
         int flag =0;
         List<String> to_remove = new ArrayList<>();
@@ -148,6 +151,5 @@ public class Factor implements Comparable<Factor> {
         st += "\n ";
         return st;
     }
-
 
 }

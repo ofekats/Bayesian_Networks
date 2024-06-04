@@ -140,7 +140,7 @@ public class Bayes_Ball_Algo {
         return res;
     }
 
-    //run the algo part by part
+    //run the algo part by part:
     //(1) create the nodes
     //(2) start from the source (as it came from the child) and get the result
     //(3) return result
